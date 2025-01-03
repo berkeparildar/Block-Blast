@@ -43,7 +43,7 @@ namespace Runtime.Controllers
             _blockPool.Enqueue(poolObject);
         }
 
-        private static ColoredBlock DequeueBlock()
+        public static ColoredBlock DequeueBlock()
         {
             ColoredBlock deQueuedPoolObject = _blockPool.Dequeue(); 
             if (deQueuedPoolObject.gameObject.activeSelf) DequeueBlock();

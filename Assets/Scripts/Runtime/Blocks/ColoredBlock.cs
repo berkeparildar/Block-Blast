@@ -98,5 +98,7 @@ namespace Runtime.Blocks
         public bool HasGroup() => _hasGroup;
 
         public void SetGroupID(int id) => _groupID = id;
+        
+        public void SetIsStationary(bool isStationary) => _isStationary = isStationary;
     }
 }

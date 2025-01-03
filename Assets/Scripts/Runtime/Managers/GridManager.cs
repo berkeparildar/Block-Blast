@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Runtime.Blocks;
 using Runtime.Controllers;
@@ -32,6 +33,7 @@ namespace Runtime.Managers
         [SerializeField] private GridVisualController visualController;
         [SerializeField] private GridBlastController blastController;
         [SerializeField] private GridBackgroundController backgroundController;
+        [SerializeField] private GridShuffleController shuffleController;
 
         #endregion
 
@@ -56,17 +58,6 @@ namespace Runtime.Managers
             GridEvents.Instance.OnBlockLanded += UpdateBlockGroupIcons;
             InputEvents.Instance.OnTap += CheckInput;
         }
-
-        private void UnsubscribeEvents()
-        {
-            GridEvents.Instance.OnBlockLanded -= UpdateBlockGroupIcons;
-            InputEvents.Instance.OnTap -= CheckInput;
-        }
-
-        private void OnDisable()
-        {
-            UnsubscribeEvents();
-        }
         
         private void SendDataToControllers()
         {
@@ -75,6 +66,7 @@ namespace Runtime.Managers
             fillController.SetData(_gridData);
             visualController.SetData(_gridData);
             backgroundController.SetData(_gridData);
+            shuffleController.SetData(_gridData);
         }
 
         private void InitializeGrid()
@@ -160,6 +152,17 @@ namespace Runtime.Managers
                         matchedBlocks = new List<ColoredBlock>() { block };
                         visualController.UpdateAndChangeColoredBlockSprites(matchedBlocks);
                     }
+                }
+            }
+
+            if (m_CurrentGroups.Count == 0)
+            {
+                StartCoroutine(ShuffleCoroutine());
+                IEnumerator ShuffleCoroutine()
+                {
+                    yield return new WaitForSeconds(2);
+                    shuffleController.ForceGuaranteedMatch();
+                    IdentifyMatchingGroups();
                 }
             }
         }

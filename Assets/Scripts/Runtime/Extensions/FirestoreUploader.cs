@@ -22,6 +22,46 @@ namespace Runtime.Extensions
                         new()
                         {
                             { "rowIndex", 0 },
+                            { "cells", new List<int> { -1, -1, -1, -1 } }
+                        },
+                        new()
+                        {
+                            { "rowIndex", 1 },
+                            { "cells", new List<int> { 0, 2, 3, 1 } }
+                        },
+                        new()
+                        {
+                            { "rowIndex", 2 },
+                            { "cells", new List<int> { 2, 1, 0, 0 } }
+                        },
+                        new()
+                        {
+                            { "rowIndex", 3 },
+                            { "cells", new List<int> { 3, 3, 1, 2 } }
+                        },
+                    };
+                    
+                    Dictionary<string, object> gridData = new()
+                    {
+                        { "GridRowSize", 4 },
+                        { "GridColumnSize", 4 },
+                        { "ColorCount", 4 },
+                        { "Grid", gridRows } 
+                    };
+                    Dictionary<string, object> levelData = new Dictionary<string, object>
+                    {
+                        { "GridData", gridData },
+                        { "Level", 1 },
+                        { "Targets", new List<int> {  0,  1 } },
+                        { "TargetCounts", new List<int> { 80, 122 } },
+                        { "MoveLimit", 40 }
+                    };
+                    /*
+                    var gridRows = new List<Dictionary<string, object>>
+                    {
+                        new()
+                        {
+                            { "rowIndex", 0 },
                             { "cells", new List<int> { -1, -1, -1, -1, -1, -1 } }
                         },
                         new()
@@ -77,6 +117,7 @@ namespace Runtime.Extensions
                         { "TargetCounts", new List<int> {8, 12} },
                         { "MoveLimit", 40 }
                     };
+                    */
 
                     UploadLevelData("levels", "1", levelData);
                 }
