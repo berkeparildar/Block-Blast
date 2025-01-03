@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ColoredBlockDefaultSymbols
+  m_EditorClassIdentifier: 
+  m_GroupName: ColoredBlockDefaultSymbols
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 627ba718897c54f458c8960fd5602258
+  m_SerializeEntries:
+  - m_GUID: ff1bdb625f336ff46bc5dd61152cd465
+    m_Address: Assets/Art/Symbols/seedling-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf41443460cbb2b43b260513e551a96c
+    m_Address: Assets/Art/Symbols/bolt-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8fa06547ad8d55b499c8b652df51fc8a
+    m_Address: Assets/Art/Symbols/heart-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0046cc6d8fb8cdd4e91a455f2c68436f
+    m_Address: Assets/Art/Symbols/fire-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1cf2f5f08fa26b4a9b0f276f51829d5
+    m_Address: Assets/Art/Symbols/bullseye-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60dca985f0d9db64b8296db2dfd5a7a1
+    m_Address: Assets/Art/Symbols/moon-solid.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: f17a0d2db7575461a855394d20d456d2, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 5e751561e19d7534a951dcaf18b5da1c, type: 2}
+    - {fileID: 11400000, guid: 9aeeda559836d5f4aa9e2f2f63a5e1ba, type: 2}
