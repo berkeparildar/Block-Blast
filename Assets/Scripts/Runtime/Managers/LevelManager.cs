@@ -20,7 +20,7 @@ namespace Runtime.Managers
         private int[] _targets;
         private int[] _targetCounts;
         private bool _levelFinish;
-        
+            
         public void Awake()
         {
             _firestoreReader = new FirestoreReader();

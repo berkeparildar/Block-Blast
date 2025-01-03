@@ -19,20 +19,21 @@ namespace Runtime.Extensions
             DependencyStatus dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
             if (dependencyStatus != DependencyStatus.Available)
             {
-                Debug.LogError($"Could not resolve Firebase dependencies: {dependencyStatus}");
                 return default;
             }
             
             _db = FirebaseFirestore.DefaultInstance;
-            Debug.Log("[FirestoreReader] Firebase Firestore is initialized.");
-
             try
             {
-                DocumentSnapshot snapshot = await _db.Collection(CollectionName).Document(level.ToString()).GetSnapshotAsync();
+                DocumentSnapshot snapshot = await _db.Collection(CollectionName).Document(level.ToString())
+                    .GetSnapshotAsync();
                 if (!snapshot.Exists)
                 {
-                    Debug.LogError($"Document does not exist!");
-                    return default;
+                    int lastLevel = level - 1;
+                    DocumentSnapshot oldSnapshot = await _db.Collection(CollectionName)
+                        .Document(lastLevel.ToString()).GetSnapshotAsync();
+                    LevelData oldLevelData = ParseLevelData(oldSnapshot.ToDictionary());
+                    return oldLevelData;
                 }
                 LevelData levelData = ParseLevelData(snapshot.ToDictionary());
                 return levelData;
