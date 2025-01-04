@@ -7,7 +7,7 @@ namespace Runtime.Managers
     public class AdsManager : MonoBehaviour
     {
 #if UNITY_ANDROID
-        private string _adUnitId = "ca-app-pub-3940256099942544/1033173712";
+        private string _adUnitId = "ca-app-pub-3082331033671775~2598942905";
 #elif UNITY_IPHONE
   private string _adUnitId = "ca-app-pub-3940256099942544/4411468910";
 #else

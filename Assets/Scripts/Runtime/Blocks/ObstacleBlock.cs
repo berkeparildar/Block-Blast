@@ -1,6 +1,7 @@
 ﻿using Runtime.Controllers;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
+using Runtime.Events;
 using UnityEngine;
 
 namespace Runtime.Blocks
@@ -21,6 +22,11 @@ namespace Runtime.Blocks
             BlockSO so = (BlockSO)BlockDataSO;
             _data = so.BlockData;
             Health = _data.Health;
+        }
+
+        public void OverrideHealth(int health)
+        {
+            _data.Health = health;
         }
 
         public override void UpdateBlockVisual()
@@ -47,6 +53,7 @@ namespace Runtime.Blocks
 
         public override void Blast()
         {
+            LevelEvents.Instance.OnBlockBlasted.Invoke(-1);
             Destroy(gameObject);
         }
     }

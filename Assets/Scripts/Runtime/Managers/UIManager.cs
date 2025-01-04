@@ -69,7 +69,7 @@ namespace Runtime.Managers
         {
             for (int i = 0; i < target.Length; i++)
             {
-                int colorIndex = target[i];
+                int colorIndex = target[i] == -1 ? 6 : target[i];
                 targets[colorIndex].SetTargetCount(targetCount[i]);
                 targets[colorIndex].gameObject.SetActive(true);
             }
@@ -79,6 +79,7 @@ namespace Runtime.Managers
 
         private void BlockBlasted(int targetIndex)
         {
+            if (targetIndex == -1) targetIndex = 6;
             targets[targetIndex].DecrementTargetCount();
         }
 

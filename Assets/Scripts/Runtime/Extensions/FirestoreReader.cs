@@ -30,6 +30,7 @@ namespace Runtime.Extensions
                 if (!snapshot.Exists)
                 {
                     int lastLevel = level - 1;
+                    PlayerPrefs.SetInt("level", lastLevel);
                     DocumentSnapshot oldSnapshot = await _db.Collection(CollectionName)
                         .Document(lastLevel.ToString()).GetSnapshotAsync();
                     LevelData oldLevelData = ParseLevelData(oldSnapshot.ToDictionary());

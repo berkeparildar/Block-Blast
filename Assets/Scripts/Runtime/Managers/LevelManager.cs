@@ -44,6 +44,7 @@ namespace Runtime.Managers
         private async void GetLevelData()
         {
             _levelData = await _firestoreReader.GetLevelData(_playerLevel);
+            _playerLevel = _levelData.Level;
             gridManager.SetGridData(_levelData.GridData);
             UIEvents.Instance.OnTargetsSet.Invoke(_levelData.Targets, _levelData.TargetCounts, _levelData.MoveLimit);
             _moveCount = _levelData.MoveLimit;
@@ -55,6 +56,7 @@ namespace Runtime.Managers
         private void GetPlayerLevel()
         {
             _playerLevel = PlayerPrefs.GetInt("level", 1);
+            Debug.LogWarning("current level:" + _playerLevel);
         }
 
         private void BlockBlasted(int colorIndex)
@@ -64,7 +66,7 @@ namespace Runtime.Managers
             {
                 int blastedIndex = targetList.IndexOf(colorIndex);
                 _targetCounts[blastedIndex]--;
-                UIEvents.Instance.OnBlockBlasted.Invoke(blastedIndex);
+                UIEvents.Instance.OnBlockBlasted.Invoke(colorIndex);
             }
 
             if (TargetsFinished() && !_levelFinish)
@@ -112,6 +114,8 @@ namespace Runtime.Managers
         {
             _playerLevel++;
             PlayerPrefs.SetInt("level", _playerLevel);
+            Debug.LogWarning("new level:" + _playerLevel);
+
             UIEvents.Instance.OnLevelWin.Invoke();
             StartCoroutine(ReloadScene());
         }
@@ -128,13 +132,10 @@ namespace Runtime.Managers
             var ad = adsManager.ShowInterstitialAd();
             if (ad == null)
             {
-                // Fallback if ad was not ready.
                 Debug.LogWarning("Interstitial ad was not ready, reloading scene...");
                 SceneManager.LoadScene(0);
                 yield break;
             }
-
-// Subscribe to ad events if non-null
             ad.OnAdFullScreenContentClosed += () => { SceneManager.LoadScene(0); };
 
             ad.OnAdFullScreenContentFailed += error => { SceneManager.LoadScene(0); };

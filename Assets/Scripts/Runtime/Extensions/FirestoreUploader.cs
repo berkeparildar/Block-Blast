@@ -22,39 +22,39 @@ namespace Runtime.Extensions
                         new()
                         {
                             { "rowIndex", 0 },
-                            { "cells", new List<int> { -1, -1, -1, -1 } }
+                            { "cells", new List<int> { 0, 1, 1, 0 } }
                         },
                         new()
                         {
                             { "rowIndex", 1 },
-                            { "cells", new List<int> { 0, 2, 3, 1 } }
+                            { "cells", new List<int> { 1, 0, 0, 1 } }
                         },
                         new()
                         {
                             { "rowIndex", 2 },
-                            { "cells", new List<int> { 2, 1, 0, 0 } }
+                            { "cells", new List<int> { 2, 2, 2, 3} }
                         },
                         new()
                         {
                             { "rowIndex", 3 },
-                            { "cells", new List<int> { 3, 3, 1, 2 } }
+                            { "cells", new List<int> { 5, 5, 5, 5} }
                         },
                     };
                     
                     Dictionary<string, object> gridData = new()
                     {
-                        { "GridRowSize", 4 },
+                        { "GridRowSize", 4},
                         { "GridColumnSize", 4 },
-                        { "ColorCount", 4 },
+                        { "ColorCount", 6 },
                         { "Grid", gridRows } 
                     };
                     Dictionary<string, object> levelData = new Dictionary<string, object>
                     {
                         { "GridData", gridData },
-                        { "Level", 1 },
-                        { "Targets", new List<int> {  0,  1 } },
-                        { "TargetCounts", new List<int> { 80, 122 } },
-                        { "MoveLimit", 40 }
+                        { "Level", 7 },
+                        { "Targets", new List<int> { 5} },
+                        { "TargetCounts", new List<int> { 12 } },
+                        { "MoveLimit", 32 }
                     };
                     /*
                     var gridRows = new List<Dictionary<string, object>>
@@ -119,7 +119,7 @@ namespace Runtime.Extensions
                     };
                     */
 
-                    UploadLevelData("levels", "1", levelData);
+                    UploadLevelData("levels", "7", levelData);
                 }
                 else
                 {
