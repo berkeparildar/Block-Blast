@@ -61,7 +61,7 @@ public partial class @PlayerInputController: IInputActionCollection2, IDisposabl
                 {
                     ""name"": """",
                     ""id"": ""dbd72d62-16a0-4730-aa98-05e06a493752"",
-                    ""path"": ""<Touchscreen>/Press"",
+                    ""path"": ""<Touchscreen>/touch0/tap"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

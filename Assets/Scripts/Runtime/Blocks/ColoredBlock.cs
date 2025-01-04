@@ -4,6 +4,7 @@ using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Enums;
 using Runtime.Events;
+using Runtime.Managers;
 using UnityEngine;
 
 namespace Runtime.Blocks
@@ -22,6 +23,7 @@ namespace Runtime.Blocks
 
         private void Awake()
         {
+            _isStationary = true;
             GetData();
             visualController.SetData(_coloredBlockData);
         }
@@ -56,6 +58,7 @@ namespace Runtime.Blocks
 
         public override void Blast()
         {
+            ParticleManager.DequeueParticle(_colorIndex, transform.position);
             LevelEvents.Instance.OnBlockBlasted.Invoke(_colorIndex);
             GridFillController.EnqueueBlock(this);
         }

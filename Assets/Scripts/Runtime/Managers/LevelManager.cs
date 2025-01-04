@@ -13,6 +13,7 @@ namespace Runtime.Managers
     public class LevelManager : MonoBehaviour
     {
         [SerializeField] private GridManager gridManager;
+        [SerializeField] private AdsManager adsManager;
         private FirestoreReader _firestoreReader;
         private int _playerLevel;
         private LevelData _levelData;
@@ -20,7 +21,7 @@ namespace Runtime.Managers
         private int[] _targets;
         private int[] _targetCounts;
         private bool _levelFinish;
-            
+
         public void Awake()
         {
             _firestoreReader = new FirestoreReader();
@@ -65,7 +66,7 @@ namespace Runtime.Managers
                 _targetCounts[blastedIndex]--;
                 UIEvents.Instance.OnBlockBlasted.Invoke(blastedIndex);
             }
-            
+
             if (TargetsFinished() && !_levelFinish)
             {
                 _levelFinish = true;
@@ -89,6 +90,7 @@ namespace Runtime.Managers
                         LevelLost();
                     }
                 }
+
                 UIEvents.Instance.OnPlayerMove.Invoke(_moveCount);
             }
         }
@@ -102,6 +104,7 @@ namespace Runtime.Managers
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -112,7 +115,7 @@ namespace Runtime.Managers
             UIEvents.Instance.OnLevelWin.Invoke();
             StartCoroutine(ReloadScene());
         }
-        
+
         private void LevelLost()
         {
             UIEvents.Instance.OnLevelLose.Invoke();
@@ -122,7 +125,19 @@ namespace Runtime.Managers
         private IEnumerator ReloadScene()
         {
             yield return new WaitForSeconds(3);
-            SceneManager.LoadScene(0);
+            var ad = adsManager.ShowInterstitialAd();
+            if (ad == null)
+            {
+                // Fallback if ad was not ready.
+                Debug.LogWarning("Interstitial ad was not ready, reloading scene...");
+                SceneManager.LoadScene(0);
+                yield break;
+            }
+
+// Subscribe to ad events if non-null
+            ad.OnAdFullScreenContentClosed += () => { SceneManager.LoadScene(0); };
+
+            ad.OnAdFullScreenContentFailed += error => { SceneManager.LoadScene(0); };
         }
     }
 }

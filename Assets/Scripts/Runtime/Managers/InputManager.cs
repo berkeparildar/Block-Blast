@@ -6,33 +6,32 @@ namespace Runtime.Managers
 {
     public class InputManager : MonoBehaviour
     {
-        private Camera m_Camera;
-        
-        private PlayerInputController m_InputController;
+        private Camera _camera;
+        private PlayerInputController _inputController;
         
         private void Awake()
         {
-            m_InputController = new PlayerInputController();
-            m_Camera = Camera.main;
+            _inputController = new PlayerInputController();
+            _camera = Camera.main;
         }
         
         private void OnEnable()
         {
-            m_InputController.Blast.Enable();
-            m_InputController.Blast.Tap.performed += OnTapPerformed;
+            _inputController.Blast.Enable();
+            _inputController.Blast.Tap.performed += OnTapPerformed;
         }
         
         private void OnDisable()
         {
-            m_InputController.Blast.Tap.performed -= OnTapPerformed;
-            m_InputController.Blast.Disable();
+            _inputController.Blast.Tap.performed -= OnTapPerformed;
+            _inputController.Blast.Disable();
         }
         
         private void OnTapPerformed(InputAction.CallbackContext context)
         {
             if (LevelEvents.Instance.IsLevelFinished.Invoke()) return;
-            Vector2 screenPos = m_InputController.Blast.Position.ReadValue<Vector2>();
-            Vector2 worldPos  = m_Camera.ScreenToWorldPoint(screenPos);
+            Vector2 screenPos = _inputController.Blast.Position.ReadValue<Vector2>();
+            Vector2 worldPos  = _camera.ScreenToWorldPoint(screenPos);
             InputEvents.Instance.OnTap?.Invoke(worldPos);
         }
     }

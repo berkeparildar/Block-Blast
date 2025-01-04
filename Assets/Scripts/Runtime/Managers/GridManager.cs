@@ -84,11 +84,16 @@ namespace Runtime.Managers
         
         private void CheckInput(Vector2 tapPosition)
         {
+            Debug.LogError("called check input ");
             int col = Mathf.RoundToInt(tapPosition.x);
             int row = Mathf.RoundToInt(tapPosition.y);
-            
-            if (IsWithinGridBounds(row, col)) 
+            Debug.Log(col + "," + row + ", " + IsWithinGridBounds(row, col));
+            if (IsWithinGridBounds(row, col))
+            {
+                Debug.LogError("is withing ");
                 GridTapped(row, col);
+            }
+            
         }
         
         private bool IsWithinGridBounds(int row, int col)
