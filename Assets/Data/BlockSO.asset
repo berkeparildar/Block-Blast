@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48c275ce0fa047309b8a8fdb85337b40, type: 3}
+  m_Name: BlockSO
+  m_EditorClassIdentifier: 
+  AllBlockDatas:
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 09fe2e4596729cb45b63f54535b9095e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    ForegroundSpriteReference:
+      m_AssetGUID: 60dca985f0d9db64b8296db2dfd5a7a1
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 4269d905b55425946820742523094f77
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: ff1bdb625f336ff46bc5dd61152cd465
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 7380e3a21f009424293a263e62fd10c5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: 8fa06547ad8d55b499c8b652df51fc8a
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 628d7cd0fd9670b45947d5656dd2f0da
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: c1cf2f5f08fa26b4a9b0f276f51829d5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 14fc7c29f4ca0ad4dbed80ade0183784
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: 0046cc6d8fb8cdd4e91a455f2c68436f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 0fae3666301135b419f67ddf270d9fc4
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: cf41443460cbb2b43b260513e551a96c
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - Health: 1
+    BackgroundSpriteReference:
+      m_AssetGUID: 534501296d338f744a6e33508685bb07
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1
+    ForegroundSpriteReference:
+      m_AssetGUID: 
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  GroupSpriteReferences:
+  - m_AssetGUID: 5b36736bbebee1c40b48ab45c7d166a5
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 6819c03de9e13684ba80bc043ea9ef66
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: e14d41910c981b343933f3c9117353a5
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 1
