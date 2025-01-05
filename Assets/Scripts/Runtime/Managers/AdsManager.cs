@@ -13,78 +13,53 @@ namespace Runtime.Managers
 #else
   private string _adUnitId = "unused";
 #endif
-        //ca-app-pub-3082331033671775~2598942905
-
         private InterstitialAd _interstitialAd;
 
         public void Start()
         {
-            // Initialize the Google Mobile Ads SDK.
             MobileAds.Initialize((InitializationStatus initStatus) =>
             {
                 // This callback is called once the MobileAds SDK is initialized.
             });
-            
-            LoadInterstitialAd();   
+
+            LoadInterstitialAd();
         }
 
-
-        /// <summary>
-        /// Loads the interstitial ad.
-        /// </summary>
-        public void LoadInterstitialAd()
+        private void LoadInterstitialAd()
         {
-            // Clean up the old ad before loading a new one.
             if (_interstitialAd != null)
             {
                 _interstitialAd.Destroy();
                 _interstitialAd = null;
             }
 
-            Debug.Log("Loading the interstitial ad.");
-
-            // create our request used to load the ad.
-            var adRequest = new AdRequest();
-
-            // send the request to load the ad.
+            AdRequest adRequest = new AdRequest();
             InterstitialAd.Load(_adUnitId, adRequest,
                 (InterstitialAd ad, LoadAdError error) =>
                 {
-                    // if error is not null, the load request failed.
                     if (error != null || ad == null)
                     {
-                        Debug.LogError("interstitial ad failed to load an ad " +
-                                       "with error : " + error);
                         return;
                     }
 
-                    Debug.Log("Interstitial ad loaded with response : "
-                              + ad.GetResponseInfo());
-
                     _interstitialAd = ad;
                     RegisterEventHandlers(_interstitialAd);
-
                 });
         }
-        
-        /// <summary>
-        /// Shows the interstitial ad.
-        /// </summary>
+
         public InterstitialAd ShowInterstitialAd()
         {
             if (_interstitialAd != null && _interstitialAd.CanShowAd())
             {
-                Debug.Log("Showing interstitial ad.");
                 _interstitialAd.Show();
                 return _interstitialAd;
             }
             else
             {
-                Debug.LogError("Interstitial ad is not ready yet.");
                 return null;
             }
         }
-        
+
         private void RegisterEventHandlers(InterstitialAd interstitialAd)
         {
             // Raised when the ad is estimated to have earned money.
@@ -94,28 +69,17 @@ namespace Runtime.Managers
                     adValue.Value,
                     adValue.CurrencyCode));
             };
-            // Raised when an impression is recorded for an ad.
-            interstitialAd.OnAdImpressionRecorded += () =>
-            {
-                Debug.Log("Interstitial ad recorded an impression.");
-            };
-            // Raised when a click is recorded for an ad.
-            interstitialAd.OnAdClicked += () =>
-            {
-                Debug.Log("Interstitial ad was clicked.");
-            };
-            // Raised when an ad opened full screen content.
+            interstitialAd.OnAdImpressionRecorded += () => { Debug.Log("Interstitial ad recorded an impression."); };
+            interstitialAd.OnAdClicked += () => { Debug.Log("Interstitial ad was clicked."); };
             interstitialAd.OnAdFullScreenContentOpened += () =>
             {
                 Debug.Log("Interstitial ad full screen content opened.");
             };
-            // Raised when the ad closed full screen content.
             interstitialAd.OnAdFullScreenContentClosed += () =>
             {
                 Debug.Log("Interstitial ad full screen content closed.");
                 LoadInterstitialAd();
             };
-            // Raised when the ad failed to open full screen content.
             interstitialAd.OnAdFullScreenContentFailed += (AdError error) =>
             {
                 Debug.LogError("Interstitial ad failed to open full screen content " +

@@ -72,7 +72,7 @@ namespace Runtime.Controllers
             transform.position = target;
         }
 
-        private float GetSineValue(float time, float maxTime)
+        private static float GetSineValue(float time, float maxTime)
         {
             float t = Mathf.Clamp01(time / maxTime);
             return Mathf.Sin(t * Mathf.PI) * 2f;

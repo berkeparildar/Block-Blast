@@ -12,14 +12,12 @@ namespace Runtime.Controllers
         
         private GridData m_GridData;
         
-        public List<ColoredBlock> CheckMatches(int row, int col, int[,] visited, int currentSearchID)
+        public List<BlastableBlock> CheckMatches(int row, int col, int[,] visited, int currentSearchID)
         {
-            List<ColoredBlock> connectedBlocks = new();
+            List<BlastableBlock> connectedBlocks = new();
             Queue<(int row, int col)> queue = new();
-
-            ColoredBlock blockAtPosition = _gridManager.GetColoredBlockAtPosition(row, col);
-
-            if (blockAtPosition == null)
+            BlastableBlock blockAtPosition = _gridManager.GetBlockAtPosition(row, col);
+            if (blockAtPosition is not null && blockAtPosition.GetColor() < 0)
                 return connectedBlocks;
             
             queue.Enqueue((row, col));
@@ -29,15 +27,15 @@ namespace Runtime.Controllers
                 (int r, int c) = queue.Dequeue();
                 if (visited[r, c] == currentSearchID) continue;
                 visited[r, c] = currentSearchID;
-                blockAtPosition = _gridManager.GetColoredBlockAtPosition(r, c);
-                if (blockAtPosition == null) continue;
+                blockAtPosition = _gridManager.GetBlockAtPosition(r, c);
+                if (blockAtPosition is null || blockAtPosition.GetColor() < 0) continue;
                 connectedBlocks.Add(blockAtPosition);
                 foreach ((int nr, int nc) in GetNeighbors(r, c))
                 {
                     if (visited[nr, nc] == currentSearchID) continue;
-                    ColoredBlock neighbor = _gridManager.GetColoredBlockAtPosition(nr, nc);
-                    if (neighbor == null) continue;
-                    if (neighbor.GetColorIndex() != blockAtPosition.GetColorIndex()) continue;
+                    BlastableBlock neighbor = _gridManager.GetBlockAtPosition(nr, nc);
+                    if (neighbor is null || neighbor.GetColor() < 0) continue;
+                    if (neighbor.GetColor() != blockAtPosition.GetColor()) continue;
                     queue.Enqueue((nr, nc));
                 }
             }
@@ -45,11 +43,11 @@ namespace Runtime.Controllers
             return connectedBlocks;
         }
         
-        public List<ObstacleBlock> FindAdjacentObstacles(List<ColoredBlock> matchedBlocks)
+        public List<BlastableBlock> FindAdjacentObstacles(List<BlastableBlock> matchedBlocks)
         {
-            List<ObstacleBlock> adjacentObstacles = new();
+            List<BlastableBlock> adjacentObstacles = new();
 
-            foreach (ColoredBlock block in matchedBlocks)
+            foreach (BlastableBlock block in matchedBlocks)
             {
                 Vector2Int position = block.GetGridPosition();
 
@@ -58,10 +56,11 @@ namespace Runtime.Controllers
 
                 foreach ((int neighborRow, int neighborCol) in GetNeighbors(row, col))
                 {
-                    Block neighborBlock = _gridManager.GetBlockAtPosition(neighborRow, neighborCol);
-                    if (neighborBlock is ObstacleBlock obstacle && !adjacentObstacles.Contains(obstacle))
+                    BlastableBlock neighborBlock = _gridManager.GetBlockAtPosition(neighborRow, neighborCol);
+                    if (neighborBlock == null) continue;
+                    if (neighborBlock.GetColor() < 0 && !adjacentObstacles.Contains(neighborBlock))
                     {
-                        adjacentObstacles.Add(obstacle);
+                        adjacentObstacles.Add(neighborBlock);
                     }
                 }
             }
@@ -70,12 +69,11 @@ namespace Runtime.Controllers
         }
 
 
-        public void SetGroupID(List<ColoredBlock> matchedBlocks, int groupID)
+        public static void SetGroupID(List<BlastableBlock> matchedBlocks, int groupID)
         {
-            foreach (ColoredBlock block in matchedBlocks)
+            foreach (BlastableBlock block in matchedBlocks)
             {
                 block.SetGroupID(groupID);
-                block.SetGroupStatus(true);
             }
         }
         

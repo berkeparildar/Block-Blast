@@ -7,6 +7,7 @@ namespace Runtime.Data.ValueObjects
     public struct BlockData
     {
         public int Health;
-        public AssetReferenceSprite[] SpriteReferences;
+        public AssetReferenceSprite BackgroundSpriteReference;
+        public AssetReferenceSprite ForegroundSpriteReference;
     }
 }

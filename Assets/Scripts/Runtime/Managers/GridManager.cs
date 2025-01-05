@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Runtime.Blocks;
@@ -16,18 +17,17 @@ namespace Runtime.Managers
 
         #region Private Variables
 
-        private Block[,] m_Grid;
-        private int[,] m_Visited;
+        private BlastableBlock[,] _grid;
+        private int[,] _visited;
         private GridData _gridData;
-        private readonly Dictionary<int, List<ColoredBlock>> m_CurrentGroups = new();
-        private int m_BlockGroupID;
-        private int m_LastVisitedID;
+        private readonly Dictionary<int, List<BlastableBlock>> _currentGroups = new();
+        private int _blockGroupID;
+        private int _lastVisitedID;
 
         #endregion
 
         #region Serialized Variables
 
-        [SerializeField] private GridSO _gridSO;
         [SerializeField] private GridFillController fillController;
         [SerializeField] private GridMatchController matchController;
         [SerializeField] private GridVisualController visualController;
@@ -38,14 +38,36 @@ namespace Runtime.Managers
         #endregion
 
         #endregion
-    
+
+        private void Awake()
+        {
+            fillController.InitializePool();
+        }
+
         public void SetGridData(GridData gridData)
         {
             _gridData = gridData;
-            m_Visited = new int[_gridData.GridRowSize, _gridData.GridColumnSize];
+            _visited = new int[_gridData.GridRowSize, _gridData.GridColumnSize];
             SendDataToControllers();
             InitializeGrid();
             GridEvents.Instance.OnGridSizeSet.Invoke(_gridData.GridColumnSize, _gridData.GridRowSize);
+        }
+
+        public void ResetGrid()
+        {
+            for (int i = 0; i < _gridData.GridRowSize; i++)
+            {
+                for (int j = 0; j < _gridData.GridColumnSize; j++)
+                {
+                    if (_grid[i, j] == null) continue;
+                    GridFillController.EnqueueBlock(_grid[i, j]);
+                    _visited[i, j] = 0;
+                    _blockGroupID = 0;
+                    _lastVisitedID = 0;
+                    _currentGroups.Clear();
+                }
+            }
+            _grid = null;
         }
 
         private void OnEnable()
@@ -64,18 +86,16 @@ namespace Runtime.Managers
             matchController.SetData(_gridData);
             blastController.SetData(_gridData);
             fillController.SetData(_gridData);
-            visualController.SetData(_gridData);
             backgroundController.SetData(_gridData);
             shuffleController.SetData(_gridData);
         }
 
         private void InitializeGrid()
         {
-            fillController.InitializePool();
-            m_Grid = fillController.CreateGrid();
+            _grid = fillController.CreateGrid();
             IdentifyMatchingGroups();
             backgroundController.SetGridBackground();
-            foreach (List<ColoredBlock> group in m_CurrentGroups.Values)
+            foreach (List<BlastableBlock> group in _currentGroups.Values)
             {
                 visualController.UpdateAndChangeColoredBlockSprites(group);
             }
@@ -84,16 +104,10 @@ namespace Runtime.Managers
         
         private void CheckInput(Vector2 tapPosition)
         {
-            Debug.LogError("called check input ");
             int col = Mathf.RoundToInt(tapPosition.x);
             int row = Mathf.RoundToInt(tapPosition.y);
-            Debug.Log(col + "," + row + ", " + IsWithinGridBounds(row, col));
             if (IsWithinGridBounds(row, col))
-            {
-                Debug.LogError("is withing ");
                 GridTapped(row, col);
-            }
-            
         }
         
         private bool IsWithinGridBounds(int row, int col)
@@ -103,21 +117,21 @@ namespace Runtime.Managers
 
         private void GridTapped(int row, int col)
         {
-            if (m_Grid[row, col] == null) return; 
-            Block tappedBlock = m_Grid[row, col];
-            if (tappedBlock is ColoredBlock block)
-                ColoredBlockTapped(block);
+            if (_grid[row, col] == null) return; 
+            BlastableBlock tappedBlock = _grid[row, col];
+            if (tappedBlock.GetColor() >= 0)
+                ColoredBlockTapped(tappedBlock);
         }
         
-        private void ColoredBlockTapped(ColoredBlock coloredBlock)
+        private void ColoredBlockTapped(BlastableBlock coloredBlock)
         {
-            if (!coloredBlock.IsStationary() || !coloredBlock.HasGroup()) return;
+            if (!coloredBlock.IsStationary() || coloredBlock.GetGroupID() < 0) return;
             
             int groupID = coloredBlock.GetGroupID();
-            List<ColoredBlock> blockGroup = m_CurrentGroups[groupID];
-            List<ObstacleBlock> adjacentObstacles = matchController.FindAdjacentObstacles(blockGroup);
+            List<BlastableBlock> blockGroup = _currentGroups[groupID];
+            List<BlastableBlock> adjacentObstacles = matchController.FindAdjacentObstacles(blockGroup);
             
-            List<Block> blocksToBlast = new();
+            List<BlastableBlock> blocksToBlast = new();
             blocksToBlast.AddRange(blockGroup);
             blocksToBlast.AddRange(adjacentObstacles);
             
@@ -131,8 +145,8 @@ namespace Runtime.Managers
         
         private void IdentifyMatchingGroups()
         {
-            m_LastVisitedID++;
-            m_CurrentGroups.Clear();
+            _lastVisitedID++;
+            _currentGroups.Clear();
             
             int rows = _gridData.GridRowSize;
             int cols = _gridData.GridColumnSize; 
@@ -141,26 +155,27 @@ namespace Runtime.Managers
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    if (m_Visited[r, c] == m_LastVisitedID) continue;
-                    List<ColoredBlock> matchedBlocks = matchController.CheckMatches(r, c, m_Visited, m_LastVisitedID);
+                    if (_visited[r, c] == _lastVisitedID) continue;
+                    if (_grid[r, c] == null) continue;
+                    List<BlastableBlock> matchedBlocks = matchController.CheckMatches(r, c, _visited, _lastVisitedID);
                     if (matchedBlocks.Count >= GameValues.MinimumMatchCount)
                     {
-                        m_CurrentGroups.Add(m_BlockGroupID, matchedBlocks);
+                        _currentGroups.Add(_blockGroupID, matchedBlocks);
                         visualController.UpdateAndChangeColoredBlockSprites(matchedBlocks);
-                        matchController.SetGroupID(matchedBlocks, m_BlockGroupID);
-                        m_BlockGroupID++;
+                        GridMatchController.SetGroupID(matchedBlocks, _blockGroupID);
+                        _blockGroupID++;
                     }
                     else
                     {
-                        if (m_Grid[r, c] is not ColoredBlock block) continue;
-                        block.SetGroupStatus(false);
-                        matchedBlocks = new List<ColoredBlock>() { block };
+                        if (_grid[r, c].GetColor() < 0) continue;
+                        _grid[r, c].SetGroupID(-1);
+                        matchedBlocks = new List<BlastableBlock>() { _grid[r, c] };
                         visualController.UpdateAndChangeColoredBlockSprites(matchedBlocks);
                     }
                 }
             }
 
-            if (m_CurrentGroups.Count == 0)
+            if (_currentGroups.Count == 0)
             {
                 StartCoroutine(ShuffleCoroutine());
                 IEnumerator ShuffleCoroutine()
@@ -174,23 +189,17 @@ namespace Runtime.Managers
 
         private void UpdateBlockGroupIcons(int groupID)
         {
-            visualController.UpdateAndChangeColoredBlockSprites(m_CurrentGroups[groupID]);
+            visualController.UpdateAndChangeColoredBlockSprites(_currentGroups[groupID]);
         }
         
-        public void SetBlockAtPosition(int row, int col, Block block)
+        public void SetBlockAtPosition(int row, int col, BlastableBlock block)
         {
-            m_Grid[row, col] = block;
+            _grid[row, col] = block;
         }
         
-        public Block GetBlockAtPosition(int row, int col)
+        public BlastableBlock GetBlockAtPosition(int row, int col)
         {
-            return m_Grid[row, col];
-        }
-        
-        public ColoredBlock GetColoredBlockAtPosition(int row, int col)
-        {
-            if (m_Grid[row, col] is ColoredBlock) return m_Grid[row, col] as ColoredBlock;
-            return null;
+            return _grid[row, col];
         }
     }
 }

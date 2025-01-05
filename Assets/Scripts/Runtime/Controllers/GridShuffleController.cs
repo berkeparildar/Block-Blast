@@ -11,6 +11,9 @@ namespace Runtime.Controllers
     public class GridShuffleController : MonoBehaviour
     {
         private GridData _gridData;
+        private const int MaxAttempts = 100;
+        private readonly Dictionary<int, int> _colorCounts = new();
+        private readonly List<BlastableBlock> _coloredBlocks = new();
         [SerializeField] private GridManager gridManager;
 
         public void SetData(GridData data)
@@ -20,15 +23,11 @@ namespace Runtime.Controllers
 
         public void ForceGuaranteedMatch()
         {
-            int rows = _gridData.GridRowSize;
-            int cols = _gridData.GridColumnSize;
-
-            List<ColoredBlock> allColoredBlocks = ExtractAllColoredBlocks();
-
-            Dictionary<int, int> colorCounts = CountBlockColors(allColoredBlocks);
+            ExtractAllColoredBlocks();
+            CountBlockColors(_coloredBlocks);
 
             int groupColorKey = -1;
-            foreach (KeyValuePair<int, int> kvp in colorCounts)
+            foreach (KeyValuePair<int, int> kvp in _colorCounts)
             {
                 if (kvp.Value >= GameValues.MinimumMatchCount)
                 {
@@ -39,27 +38,26 @@ namespace Runtime.Controllers
 
             if (groupColorKey == -1)
             {
-                groupColorKey = colorCounts.OrderByDescending(x => x.Value).First().Key;
-                int needed = GameValues.MinimumMatchCount - colorCounts[groupColorKey];
+                groupColorKey = _colorCounts.OrderByDescending(x => x.Value).First().Key;
+                int needed = GameValues.MinimumMatchCount - _colorCounts[groupColorKey];
                 for (int i = 0; i < needed; i++)
                 {
-                    ColoredBlock blockToRecolor = allColoredBlocks
-                        .First(b => b.GetColorIndex() != groupColorKey);
-                    blockToRecolor.SetColorIndex(groupColorKey);
+                    BlastableBlock blockToRecolor = _coloredBlocks
+                        .First(b => b.GetColor() != groupColorKey);
+                    blockToRecolor.SetColor(groupColorKey);
                 }
             }
+            _colorCounts.Clear();
 
-            // 4) Grab exactly MinimumMatchCount blocks of that color
-            List<ColoredBlock> groupedBlocks = allColoredBlocks
-                .Where(b => b.GetColorIndex() == groupColorKey)
+            List<BlastableBlock> groupedBlocks = _coloredBlocks
+                .Where(b => b.GetColor() == groupColorKey)
                 .Take(GameValues.MinimumMatchCount)
                 .ToList();
 
             // remove them from 'allColoredBlocks'
-            foreach (ColoredBlock b in groupedBlocks)
-                allColoredBlocks.Remove(b);
+            foreach (BlastableBlock b in groupedBlocks)
+                _coloredBlocks.Remove(b);
 
-            // 5) Clear grid
             ClearGrid();
 
             // 6) Find a random placement for the matched blocks
@@ -75,7 +73,6 @@ namespace Runtime.Controllers
             {
                 placementRow = 0;
                 startCol = 0;
-                Debug.LogWarning("Failed to find random adjacent placement, using fallback.");
             }
 
             // Place the matched blocks in the chosen row/columns
@@ -84,24 +81,24 @@ namespace Runtime.Controllers
                 int c = startCol + i;
                 gridManager.SetBlockAtPosition(placementRow, c, groupedBlocks[i]);
                 groupedBlocks[i].SetInitialBlockPosition(c, placementRow);
-                groupedBlocks[i].UpdateSortingOrder(placementRow);
+                groupedBlocks[i].UpdateSortingOrder();
             }
 
             // 7) Fill remaining grid positions
-            for (int r = 0; r < rows; r++)
+            for (int r = 0; r < _gridData.GridRowSize; r++)
             {
-                for (int c = 0; c < cols; c++)
+                for (int c = 0; c < _gridData.GridColumnSize; c++)
                 {
                     // If this position is already occupied or an obstacle, skip it
                     if (gridManager.GetBlockAtPosition(r, c) != null)
                         continue;
 
                     // Place a leftover block or dequeue a new one
-                    ColoredBlock blockToPlace;
-                    if (allColoredBlocks.Count > 0)
+                    BlastableBlock blockToPlace;
+                    if (_coloredBlocks.Count > 0)
                     {
-                        blockToPlace = allColoredBlocks[0];
-                        allColoredBlocks.RemoveAt(0);
+                        blockToPlace = _coloredBlocks[0];
+                        _coloredBlocks.RemoveAt(0);
                     }
                     else
                     {
@@ -110,112 +107,69 @@ namespace Runtime.Controllers
 
                     gridManager.SetBlockAtPosition(r, c, blockToPlace);
                     blockToPlace.SetInitialBlockPosition(c, r);
-                    blockToPlace.UpdateSortingOrder(r);
+                    blockToPlace.UpdateSortingOrder();
                 }
             }
+            _coloredBlocks.Clear();
         }
 
-        private List<ColoredBlock> ExtractAllColoredBlocks()
+        private void ExtractAllColoredBlocks()
         {
-            int rows = _gridData.GridRowSize;
-            int cols = _gridData.GridColumnSize;
-            List<ColoredBlock> blocks = new();
-            for (int r = 0; r < rows; r++)
+            
+            for (int r = 0; r < _gridData.GridRowSize; r++)
             {
-                for (int c = 0; c < cols; c++)
+                for (int c = 0; c < _gridData.GridColumnSize; c++)
                 {
-                    Block b = gridManager.GetBlockAtPosition(r, c);
-                    if (b is ColoredBlock cb)
+                    BlastableBlock b = gridManager.GetBlockAtPosition(r, c);
+                    if (b.GetColor() >= 0)
                     {
-                        blocks.Add(cb);
+                        _coloredBlocks.Add(b);
                     }
                 }
             }
-
-            return blocks;
         }
 
-        private Dictionary<int, int> CountBlockColors(List<ColoredBlock> blocks)
+        private void CountBlockColors(List<BlastableBlock> blocks)
         {
-            Dictionary<int, int> colorCounts = new();
-            foreach (ColoredBlock block in blocks)
+            foreach (BlastableBlock block in blocks)
             {
-                int color = block.GetColorIndex();
-                colorCounts.TryAdd(color, 0);
-                colorCounts[color]++;
+                int color = block.GetColor();
+                if (color < 0) continue;
+                _colorCounts.TryAdd(color, 0);
+                _colorCounts[color]++;
             }
-
-            return colorCounts;
         }
 
         private void ClearGrid()
         {
-            int rows = (int)_gridData.GridRowSize;
-            int cols = (int)_gridData.GridColumnSize;
-            for (int r = 0; r < rows; r++)
+            for (int r = 0; r < _gridData.GridRowSize; r++)
             {
-                for (int c = 0; c < cols; c++)
+                for (int c = 0; c < _gridData.GridColumnSize; c++)
                 {
-                    if (gridManager.GetBlockAtPosition(r, c) is ColoredBlock)
+                    if (gridManager.GetBlockAtPosition(r, c).GetColor() >= 0)
                         gridManager.SetBlockAtPosition(r, c, null);
                 }
             }
         }
 
-        private List<(int row, int col)> GetValidPositions()
-        {
-            List<(int row, int col)> validPositions = new();
-            int rows = _gridData.GridRowSize;
-            int cols = _gridData.GridColumnSize;
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                {
-                    Block b = gridManager.GetBlockAtPosition(r, c);
-                    bool isObstacle = b != null && (b is ObstacleBlock);
-
-                    if (!isObstacle)
-                    {
-                        validPositions.Add((r, c));
-                    }
-                }
-            }
-
-            return validPositions;
-        }
-
-        private bool TryGetRandomAdjacentPlacement(
-            out int placementRow,
-            out int startCol,
-            int neededCount
-        )
+        private bool TryGetRandomAdjacentPlacement(out int placementRow, out int startCol, int neededCount)
         {
             placementRow = -1;
             startCol = -1;
 
-            int rows = _gridData.GridRowSize;
-            int cols = _gridData.GridColumnSize;
-
-            // Up to some max attempts to find a suitable row
-            const int MAX_ATTEMPTS = 100;
-            for (int i = 0; i < MAX_ATTEMPTS; i++)
+            for (int i = 0; i < MaxAttempts; i++)
             {
-                int randomRow = Random.Range(0, rows);
-
-                // We want to find a consecutive set of columns for neededCount blocks
-                int possibleStartColMax = cols - neededCount;
-                if (possibleStartColMax < 0) continue; // not enough columns at all
+                int randomRow = Random.Range(0, _gridData.GridRowSize);
+                int possibleStartColMax = _gridData.GridColumnSize - neededCount;
+                if (possibleStartColMax < 0) continue; 
 
                 int randomStartCol = Random.Range(0, possibleStartColMax + 1);
-
-                // Check if each position (randomRow, randomStartCol..randomStartCol+neededCount-1)
-                // is valid (not an obstacle).
+                
                 bool canPlace = true;
                 for (int offset = 0; offset < neededCount; offset++)
                 {
-                    Block b = gridManager.GetBlockAtPosition(randomRow, randomStartCol + offset);
-                    bool isObstacle = b != null && !(b is ColoredBlock);
+                    BlastableBlock b = gridManager.GetBlockAtPosition(randomRow, randomStartCol + offset);
+                    bool isObstacle = b && b.GetColor() < 0;
                     if (isObstacle)
                     {
                         canPlace = false;

@@ -12,11 +12,11 @@ namespace Runtime.Controllers
         [SerializeField] private GridManager _gridManager;
         private GridData m_GridData;
         
-        public List<int> Blast(List<Block> matchedBlocks)
+        public List<int> Blast(List<BlastableBlock> matchedBlocks)
         {
             List<int> blastedColumns = new();
             
-            foreach (Block block in matchedBlocks)
+            foreach (BlastableBlock block in matchedBlocks)
             {
                 Vector2Int gridPosition = block.GetGridPosition();
                 
@@ -46,15 +46,14 @@ namespace Runtime.Controllers
                     if (_gridManager.GetBlockAtPosition(r, c) != null) continue;
                     for (int nr = r + 1; nr < rows; nr++)
                     {
-                        Block aboveBlock = _gridManager.GetBlockAtPosition(nr, c);
+                        BlastableBlock aboveBlock = _gridManager.GetBlockAtPosition(nr, c);
                         if (aboveBlock == null) continue;
-                        if (aboveBlock is ObstacleBlock) break;
+                        if (aboveBlock.GetColor() < 0) break;
                         
                         _gridManager.SetBlockAtPosition(r, c, aboveBlock);
                         _gridManager.SetBlockAtPosition(nr, c, null);
                         
-                        ColoredBlock coloredBlock = (ColoredBlock)aboveBlock;
-                        StartCoroutine(coloredBlock.MoveToTargetGridPosition(new Vector2Int(c, r)));
+                        StartCoroutine(aboveBlock.MoveToTargetGridPosition(new Vector2Int(c, r)));
                         
                         break;
                     }

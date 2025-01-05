@@ -40,6 +40,12 @@ namespace Runtime.Managers
             {
                 yield return new WaitForSeconds(1.5f);
                 ShowLoadingScreen();
+                yield return new WaitForSeconds(1);
+                foreach (UITargetController tc in targets)
+                {
+                    tc.gameObject.SetActive(false);
+                }
+                winScreen.SetActive(false);
             }
         }
         
@@ -52,6 +58,12 @@ namespace Runtime.Managers
             {
                 yield return new WaitForSeconds(1.5f);
                 ShowLoadingScreen();
+                yield return new WaitForSeconds(1);
+                foreach (UITargetController tc in targets)
+                {
+                    tc.gameObject.SetActive(false);
+                }
+                loseScreen.SetActive(false);
             }
         }
 
@@ -70,8 +82,8 @@ namespace Runtime.Managers
             for (int i = 0; i < target.Length; i++)
             {
                 int colorIndex = target[i] == -1 ? 6 : target[i];
-                targets[colorIndex].SetTargetCount(targetCount[i]);
                 targets[colorIndex].gameObject.SetActive(true);
+                targets[colorIndex].SetTargetCount(targetCount[i]);
             }
             
             moveCountText.text = moveCount.ToString();        

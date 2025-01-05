@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GoogleMobileAds.Api;
 using Runtime.Data.ValueObjects;
 using Runtime.Events;
 using Runtime.Extensions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Runtime.Managers
 {
@@ -25,8 +24,7 @@ namespace Runtime.Managers
         public void Awake()
         {
             _firestoreReader = new FirestoreReader();
-            GetPlayerLevel();
-            GetLevelData();
+            InitializeLevel();
         }
 
         private void OnEnable()
@@ -39,6 +37,13 @@ namespace Runtime.Managers
             LevelEvents.Instance.OnBlockBlasted += BlockBlasted;
             LevelEvents.Instance.OnBlast += PlayerBlasted;
             LevelEvents.Instance.IsLevelFinished += () => _levelFinish;
+        }
+
+        private void InitializeLevel()
+        {
+            _levelFinish = false;
+            GetPlayerLevel();
+            GetLevelData();
         }
 
         private async void GetLevelData()
@@ -56,7 +61,6 @@ namespace Runtime.Managers
         private void GetPlayerLevel()
         {
             _playerLevel = PlayerPrefs.GetInt("level", 1);
-            Debug.LogWarning("current level:" + _playerLevel);
         }
 
         private void BlockBlasted(int colorIndex)
@@ -78,23 +82,21 @@ namespace Runtime.Managers
 
         private void PlayerBlasted()
         {
-            if (_moveCount > 0)
+            if (_moveCount <= 0) return;
+            _moveCount--;
+            if (_moveCount == 0)
             {
-                _moveCount--;
-                if (_moveCount == 0)
+                if (TargetsFinished())
                 {
-                    if (TargetsFinished())
-                    {
-                        LevelWon();
-                    }
-                    else
-                    {
-                        LevelLost();
-                    }
+                    LevelWon();
                 }
-
-                UIEvents.Instance.OnPlayerMove.Invoke(_moveCount);
+                else
+                {
+                    LevelLost();
+                }
             }
+
+            UIEvents.Instance.OnPlayerMove.Invoke(_moveCount);
         }
 
         private bool TargetsFinished()
@@ -114,8 +116,6 @@ namespace Runtime.Managers
         {
             _playerLevel++;
             PlayerPrefs.SetInt("level", _playerLevel);
-            Debug.LogWarning("new level:" + _playerLevel);
-
             UIEvents.Instance.OnLevelWin.Invoke();
             StartCoroutine(ReloadScene());
         }
@@ -129,16 +129,18 @@ namespace Runtime.Managers
         private IEnumerator ReloadScene()
         {
             yield return new WaitForSeconds(3);
-            var ad = adsManager.ShowInterstitialAd();
+            gridManager.ResetGrid();
+            InterstitialAd ad = adsManager.ShowInterstitialAd();
             if (ad == null)
             {
                 Debug.LogWarning("Interstitial ad was not ready, reloading scene...");
-                SceneManager.LoadScene(0);
                 yield break;
             }
-            ad.OnAdFullScreenContentClosed += () => { SceneManager.LoadScene(0); };
-
-            ad.OnAdFullScreenContentFailed += error => { SceneManager.LoadScene(0); };
+            ad.OnAdFullScreenContentClosed += InitializeLevel;
+            ad.OnAdFullScreenContentFailed += error =>
+            {
+                InitializeLevel();
+            };
         }
     }
 }

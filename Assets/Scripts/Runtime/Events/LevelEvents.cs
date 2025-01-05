@@ -9,6 +9,7 @@ namespace Runtime.Events
         public UnityAction OnBlast = delegate { };
         public UnityAction<int> OnBlockBlasted = delegate { };
         public UnityAction OnLevelInitialized = delegate { };
+        public UnityAction OnLevelFinished = delegate { };
         public Func<bool> IsLevelFinished = delegate { return false; };
     }
 }

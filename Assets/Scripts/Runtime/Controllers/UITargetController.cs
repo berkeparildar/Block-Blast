@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace Runtime.Controllers
@@ -24,9 +25,13 @@ namespace Runtime.Controllers
             }
             else
             {
-                targetCountText.gameObject.SetActive(false);
                 checkMark.SetActive(true);
             }
+        }
+
+        private void OnDisable()
+        {
+            checkMark.SetActive(false);
         }
     }
 }
