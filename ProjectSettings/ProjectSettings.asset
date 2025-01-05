@@ -76,6 +76,7 @@ PlayerSettings:
   androidMinimumWindowWidth: 400
   androidMinimumWindowHeight: 300
   androidFullscreenMode: 1
+  androidAutoRotationBehavior: 1
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
   runInBackground: 0
@@ -83,6 +84,7 @@ PlayerSettings:
   muteOtherAudioSources: 0
   Prepare IOS For Recording: 0
   Force IOS Speakers When Recording: 0
+  audioSpatialExperience: 0
   deferSystemGesturesMode: 0
   hideHomeButton: 0
   submitAnalytics: 1
@@ -136,6 +138,8 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
+  visionOSBundleVersion: 1.0
+  tvOSBundleVersion: 1.0
   bundleVersion: 1.0
   preloadedAssets: []
   metroInputSource: 0
@@ -182,8 +186,10 @@ PlayerSettings:
   strictShaderVariantMatching: 0
   VertexChannelCompressionMask: 208
   iPhoneSdkVersion: 988
+  iOSSimulatorArchitecture: 0
   iOSTargetOSVersionString: 12.0
   tvOSSdkVersion: 0
+  tvOSSimulatorArchitecture: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 12.0
   VisionOSSdkVersion: 0
@@ -230,6 +236,7 @@ PlayerSettings:
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
   metalAPIValidation: 1
+  metalCompileShaderBinary: 0
   iOSRenderExtraFrameOnPause: 0
   iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
@@ -247,14 +254,14 @@ PlayerSettings:
   clonedFromGUID: c19f32bac17ee4170b3bf8a6a0333fb9
   templatePackageId: com.unity.template.universal-2d@2.1.2
   templateDefaultScene: Assets/Scenes/SampleScene.unity
-  useCustomMainManifest: 0
-  useCustomLauncherManifest: 0
+  useCustomMainManifest: 1
+  useCustomLauncherManifest: 1
   useCustomMainGradleTemplate: 1
-  useCustomLauncherGradleManifest: 0
-  useCustomBaseGradleTemplate: 0
+  useCustomLauncherGradleManifest: 1
+  useCustomBaseGradleTemplate: 1
   useCustomGradlePropertiesTemplate: 1
-  useCustomGradleSettingsTemplate: 0
-  useCustomProguardFile: 0
+  useCustomGradleSettingsTemplate: 1
+  useCustomProguardFile: 1
   AndroidTargetArchitectures: 3
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
@@ -276,7 +283,7 @@ PlayerSettings:
   androidGamepadSupportLevel: 0
   chromeosInputEmulation: 1
   AndroidMinifyRelease: 0
-  AndroidMinifyDebug: 0
+  AndroidMinifyDebug: 1
   AndroidValidateAppBundleSize: 1
   AndroidAppBundleSizeToValidate: 150
   m_BuildTargetIcons:
@@ -653,6 +660,7 @@ PlayerSettings:
   switchSocketBufferEfficiency: 4
   switchSocketInitializeEnabled: 1
   switchNetworkInterfaceManagerInitializeEnabled: 1
+  switchDisableHTCSPlayerConnection: 0
   switchUseNewStyleFilepaths: 0
   switchUseLegacyFmodPriorities: 0
   switchUseMicroSleepForYield: 1
@@ -816,6 +824,7 @@ PlayerSettings:
   metroTileBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21568628, a: 0}
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628, a: 1}
   metroSplashScreenUseBackgroundColor: 0
+  syncCapabilities: 0
   platformCapabilities: {}
   metroTargetDeviceFamilies: {}
   metroFTAName: 
@@ -868,7 +877,7 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 2
+  activeInputHandler: 1
   windowsGamepadBackendHint: 0
   cloudProjectId: e46f8850-afd8-4cb0-a305-522d016a8554
   framebufferDepthMemorylessMode: 0
