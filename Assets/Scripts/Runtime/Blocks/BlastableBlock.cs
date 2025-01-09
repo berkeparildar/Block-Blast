@@ -63,12 +63,7 @@ namespace Runtime.Blocks
             _health--;
             return _health;
         }
-        
-        public Vector2Int GetGridPosition()
-        {
-            return new Vector2Int(_columnPosition, _rowPosition);
-        }
-        
+
         public void Blast()
         {
             ParticleManager.DequeueParticle(_colorIndex, transform.position);
@@ -110,8 +105,9 @@ namespace Runtime.Blocks
         
         public void UpdateSymbol(int groupCount)
         {
-            int symbolIndex = GameValues.GetGroupSymbolIndex(groupCount);
             if (_colorIndex < 0 ) return;
+            if (!_isStationary) return;
+            int symbolIndex = GameValues.GetGroupSymbolIndex(groupCount);
             if (_currentForegroundSpriteHandle.IsValid())
                 Addressables.Release(_currentForegroundSpriteHandle);
             AssetReferenceSprite spriteRef;
