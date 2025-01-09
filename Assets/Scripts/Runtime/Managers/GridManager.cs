@@ -88,10 +88,6 @@ namespace Runtime.Managers
             _grid = fillController.CreateGrid();
             IdentifyMatchingGroups();
             backgroundController.SetGridBackground();
-            foreach (List<GridPosition> group in _currentGroups.Values)
-            {
-                visualController.UpdateAndChangeColoredBlockSprites(group);
-            }
         }
         
         private void CheckInput(Vector2 tapPosition)
