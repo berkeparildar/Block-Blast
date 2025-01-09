@@ -12,22 +12,20 @@ namespace Runtime.Controllers
         [SerializeField] private GridManager _gridManager;
         private GridData m_GridData;
         
-        public List<int> Blast(List<BlastableBlock> matchedBlocks)
+        public List<int> Blast(List<GridPosition> matchedBlocks)
         {
             List<int> blastedColumns = new();
             
-            foreach (BlastableBlock block in matchedBlocks)
+            foreach (GridPosition pos in matchedBlocks)
             {
-                Vector2Int gridPosition = block.GetGridPosition();
-                
-                if (!blastedColumns.Contains(block.GetGridPosition().x))
+                if (!blastedColumns.Contains(pos.Column))
                 {
-                    blastedColumns.Add(block.GetGridPosition().x);
+                    blastedColumns.Add(pos.Column);
                 }
 
-                if (block.TakeDamage() > 0) continue;
-                _gridManager.SetBlockAtPosition(gridPosition.y, gridPosition.x, null);
-                block.Blast();
+                if (_gridManager.GetBlockAtPosition(pos.Row, pos.Column).TakeDamage() > 0) continue;
+                _gridManager.GetBlockAtPosition(pos.Row, pos.Column).Blast();
+                _gridManager.SetBlockAtPosition(pos.Row, pos.Column, null);
                 
             }
             LevelEvents.Instance.OnBlast.Invoke();

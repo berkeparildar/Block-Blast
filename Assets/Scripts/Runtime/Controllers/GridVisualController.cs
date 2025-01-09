@@ -14,13 +14,13 @@ namespace Runtime.Controllers
         
         [SerializeField] private GridManager gridManager;
         
-        public void UpdateAndChangeColoredBlockSprites(List<BlastableBlock> connectedGroup)
+        public void UpdateAndChangeColoredBlockSprites(List<GridPosition> connectedGroup)
         { ;
             
             int symbolIndex = GameValues.GetGroupSymbolIndex(connectedGroup.Count);
-            foreach (BlastableBlock block in connectedGroup.Where(block => block))
+            foreach (GridPosition pos in connectedGroup)
             {
-                block.UpdateSymbol(symbolIndex);
+                gridManager.GetBlockAtPosition(pos.Row, pos.Column).UpdateSymbol(symbolIndex);
             }
         }
 

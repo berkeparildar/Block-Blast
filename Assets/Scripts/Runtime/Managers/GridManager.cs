@@ -13,20 +13,13 @@ namespace Runtime.Managers
 {
     public class GridManager : MonoBehaviour
     {
-        #region Variables
-
-        #region Private Variables
-
+        
         private BlastableBlock[,] _grid;
         private int[,] _visited;
         private GridData _gridData;
-        private readonly Dictionary<int, List<BlastableBlock>> _currentGroups = new();
+        private readonly Dictionary<int, List<GridPosition>> _currentGroups = new();
         private int _blockGroupID;
         private int _lastVisitedID;
-
-        #endregion
-
-        #region Serialized Variables
 
         [SerializeField] private GridFillController fillController;
         [SerializeField] private GridMatchController matchController;
@@ -35,10 +28,9 @@ namespace Runtime.Managers
         [SerializeField] private GridBackgroundController backgroundController;
         [SerializeField] private GridShuffleController shuffleController;
 
-        #endregion
-
-        #endregion
-
+        private readonly List<GridPosition> _connectedBlocks = new();
+        private readonly Queue<GridPosition> _matchQueue = new();
+        
         private void Awake()
         {
             fillController.InitializePool();
@@ -95,11 +87,10 @@ namespace Runtime.Managers
             _grid = fillController.CreateGrid();
             IdentifyMatchingGroups();
             backgroundController.SetGridBackground();
-            foreach (List<BlastableBlock> group in _currentGroups.Values)
+            foreach (List<GridPosition> group in _currentGroups.Values)
             {
                 visualController.UpdateAndChangeColoredBlockSprites(group);
             }
-            
         }
         
         private void CheckInput(Vector2 tapPosition)
@@ -128,19 +119,46 @@ namespace Runtime.Managers
             if (!coloredBlock.IsStationary() || coloredBlock.GetGroupID() < 0) return;
             
             int groupID = coloredBlock.GetGroupID();
-            List<BlastableBlock> blockGroup = _currentGroups[groupID];
-            List<BlastableBlock> adjacentObstacles = matchController.FindAdjacentObstacles(blockGroup);
+            List<GridPosition> blockGroup = _currentGroups[groupID];
             
-            List<BlastableBlock> blocksToBlast = new();
-            blocksToBlast.AddRange(blockGroup);
-            blocksToBlast.AddRange(adjacentObstacles);
-            
-            List<int> blastedPositions = blastController.Blast(blocksToBlast);
+            List<int> blastedPositions = blastController.Blast(blockGroup);
             
             blastController.UpdateGridAfterBlast(blastedPositions);
             fillController.RefillEmptyCells(blastedPositions);
             
             IdentifyMatchingGroups();
+        }
+
+        private void CheckMatches(GridPosition pos)
+        {
+            _matchQueue.Clear();
+            _connectedBlocks.Clear();
+            
+            _matchQueue.Enqueue(pos);
+
+            while (_matchQueue.Count > 0)
+            {
+                GridPosition currentPos = _matchQueue.Dequeue();
+                if (_visited[currentPos.Row, currentPos.Column] == _lastVisitedID) continue;
+                _visited[currentPos.Row, currentPos.Column] = _lastVisitedID;
+                BlastableBlock currentBlock = _grid[currentPos.Row, currentPos.Column];
+                _connectedBlocks.Add(currentPos);
+                foreach (GridPosition neighborPos in GetNeighbors(currentPos))
+                {
+                    if (_visited[neighborPos.Row, neighborPos.Column] == _lastVisitedID) continue;
+                    BlastableBlock neighbor = _grid[neighborPos.Row, neighborPos.Column];
+                    if (neighbor is null) continue;
+                    if (neighbor.GetColor() < 0)
+                    {
+                        if (!_connectedBlocks.Contains(neighborPos)) 
+                            _connectedBlocks.Add(neighborPos);
+                    }
+                    else if (neighbor.GetColor() == currentBlock.GetColor())
+                    {
+                        _matchQueue.Enqueue(neighborPos);
+                    }
+                }
+            }
         }
         
         private void IdentifyMatchingGroups()
@@ -156,21 +174,28 @@ namespace Runtime.Managers
                 for (int c = 0; c < cols; c++)
                 {
                     if (_visited[r, c] == _lastVisitedID) continue;
-                    if (_grid[r, c] == null) continue;
-                    List<BlastableBlock> matchedBlocks = matchController.CheckMatches(r, c, _visited, _lastVisitedID);
-                    if (matchedBlocks.Count >= GameValues.MinimumMatchCount)
+                    if (_grid[r, c].GetColor() < 0) continue;
+                    if (!_grid[r, c]) continue;
+                    CheckMatches(new GridPosition(r, c));
+                    int coloredBlockCount = 0;
+                    
+                    foreach (GridPosition pos in _connectedBlocks)
                     {
-                        _currentGroups.Add(_blockGroupID, matchedBlocks);
-                        visualController.UpdateAndChangeColoredBlockSprites(matchedBlocks);
-                        GridMatchController.SetGroupID(matchedBlocks, _blockGroupID);
+                        if (_grid[pos.Row, pos.Column].GetColor() >= 0) coloredBlockCount++;
+                    }
+                    
+                    if (coloredBlockCount >= GameValues.MinimumMatchCount)
+                    {
+                        _currentGroups.Add(_blockGroupID, new List<GridPosition>(_connectedBlocks));
+                        visualController.UpdateAndChangeColoredBlockSprites(_connectedBlocks);
+                        matchController.SetGroupID(_connectedBlocks, _blockGroupID);
                         _blockGroupID++;
                     }
                     else
                     {
                         if (_grid[r, c].GetColor() < 0) continue;
                         _grid[r, c].SetGroupID(-1);
-                        matchedBlocks = new List<BlastableBlock>() { _grid[r, c] };
-                        visualController.UpdateAndChangeColoredBlockSprites(matchedBlocks);
+                        visualController.UpdateAndChangeColoredBlockSprites( new List<GridPosition>() { new GridPosition(r, c) } );
                     }
                 }
             }
@@ -201,5 +226,17 @@ namespace Runtime.Managers
         {
             return _grid[row, col];
         }
+        
+        private IEnumerable<GridPosition> GetNeighbors(GridPosition pos)
+        {
+            int rows = _gridData.GridRowSize;
+            int cols = _gridData.GridColumnSize;
+
+            if (pos.Row > 0) yield return new GridPosition(pos.Row- 1, pos.Column);
+            if (pos.Row < rows - 1) yield return  new GridPosition(pos.Row + 1, pos.Column);
+            if (pos.Column > 0) yield return  new GridPosition(pos.Row, pos.Column - 1);
+            if (pos.Column < cols - 1) yield return  new GridPosition(pos.Row, pos.Column + 1);
+        }
+
     }
 }

@@ -41,6 +41,7 @@ namespace Runtime.Blocks
             _colorIndex = colorIndex;
             GetData();
             UpdateBackground();
+            _isStationary = true;
         } 
         
         private void GetData()
