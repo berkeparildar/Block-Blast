@@ -20,7 +20,7 @@ namespace Runtime.Controllers
         public void SetData(GridData data)
         {
             _gridData = data;
-            _spawnPos = _gridData.GridRowSize + (Mathf.RoundToInt(_gridData.GridRowSize / 2f)) + 1;
+            _spawnPos = _gridData.GridRowSize;
         }
 
         public void InitializePool()
@@ -70,13 +70,15 @@ namespace Runtime.Controllers
             return grid;
         }
 
-        public void RefillEmptyCells(List<int> affectedColumns)
+        public void RefillEmptyCells((GridPosition min, GridPosition max) gridBounds)
         {
             int rows = _gridData.GridRowSize;
+            int affectedRowCount = gridBounds.max.Row - gridBounds.min.Row + 1;
 
-            foreach (int c in affectedColumns)
+            for (int c = gridBounds.min.Column; c <= gridBounds.max.Column; c++)
             {
-                for (int r = rows - 1; r >= 0; r--)
+                int r = rows - 1;
+                for (int i = 0; i < affectedRowCount; i++)
                 {
                     if (gridManager.GetBlockAtPosition(r, c) != null)
                     {
@@ -88,11 +90,12 @@ namespace Runtime.Controllers
                         BlastableBlock newBlock = DequeueBlock();
                         int randomColor = Random.Range(0, _gridData.ColorCount);
                         newBlock.SetColor(randomColor);
-                        newBlock.transform.position = new Vector3(c, _spawnPos + r);
+                        newBlock.transform.position = new Vector3(c, _spawnPos + (affectedRowCount - i));
                         gridManager.SetBlockAtPosition(r, c, newBlock);
                         StartCoroutine(newBlock.MoveToTargetGridPosition(new Vector2Int(c, r)));
                         newBlock.UpdateSortingOrder();
                     }
+                    r--;
                 }
             }
         }

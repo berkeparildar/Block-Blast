@@ -4,6 +4,7 @@ using Runtime.Controllers;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Events;
+using Runtime.Extensions;
 using Runtime.Managers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -107,8 +108,9 @@ namespace Runtime.Blocks
             };
         }
         
-        public void UpdateSymbol(int symbolIndex)
+        public void UpdateSymbol(int groupCount)
         {
+            int symbolIndex = GameValues.GetGroupSymbolIndex(groupCount);
             if (_colorIndex < 0 ) return;
             if (_currentForegroundSpriteHandle.IsValid())
                 Addressables.Release(_currentForegroundSpriteHandle);

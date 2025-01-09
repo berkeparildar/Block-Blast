@@ -117,12 +117,9 @@ namespace Runtime.Managers
             
             int groupID = coloredBlock.GetGroupID();
             List<GridPosition> blockGroup = _currentGroups[groupID];
-            
-            List<int> blastedPositions = blastController.Blast(blockGroup);
-            
+            var blastedPositions = blastController.Blast(blockGroup);
             blastController.UpdateGridAfterBlast(blastedPositions);
             fillController.RefillEmptyCells(blastedPositions);
-            
             IdentifyMatchingGroups();
         }
 
@@ -158,6 +155,11 @@ namespace Runtime.Managers
                     }
                 }
             }
+
+            foreach (GridPosition blockPos in _connectedBlocks)
+            {
+                _grid[blockPos.Row, blockPos.Column].UpdateSymbol(_coloredBlockCountInGroup);
+            }
         }
         
         private void IdentifyMatchingGroups()
@@ -180,15 +182,12 @@ namespace Runtime.Managers
                     if (_coloredBlockCountInGroup >= GameValues.MinimumMatchCount)
                     {
                         _currentGroups.Add(_blockGroupID, new List<GridPosition>(_connectedBlocks));
-                        visualController.UpdateAndChangeColoredBlockSprites(_connectedBlocks);
                         matchController.SetGroupID(_connectedBlocks, _blockGroupID);
                         _blockGroupID++;
                     }
                     else
                     {
-                        if (_grid[r, c].GetColor() < 0) continue;
                         _grid[r, c].SetGroupID(-1);
-                        visualController.UpdateAndChangeColoredBlockSprites( new List<GridPosition>() { new GridPosition(r, c) } );
                     }
                 }
             }
