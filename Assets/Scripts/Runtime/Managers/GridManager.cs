@@ -30,6 +30,7 @@ namespace Runtime.Managers
 
         private readonly List<GridPosition> _connectedBlocks = new();
         private readonly Queue<GridPosition> _matchQueue = new();
+        private int _coloredBlockCountInGroup;
         
         private void Awake()
         {
@@ -133,11 +134,13 @@ namespace Runtime.Managers
         {
             _matchQueue.Clear();
             _connectedBlocks.Clear();
+            _coloredBlockCountInGroup = 0;
             
             _matchQueue.Enqueue(pos);
 
             while (_matchQueue.Count > 0)
             {
+                _coloredBlockCountInGroup++;
                 GridPosition currentPos = _matchQueue.Dequeue();
                 if (_visited[currentPos.Row, currentPos.Column] == _lastVisitedID) continue;
                 _visited[currentPos.Row, currentPos.Column] = _lastVisitedID;
@@ -173,18 +176,12 @@ namespace Runtime.Managers
             {
                 for (int c = 0; c < cols; c++)
                 {
+                    if (_grid[r, c] is null) continue;
                     if (_visited[r, c] == _lastVisitedID) continue;
                     if (_grid[r, c].GetColor() < 0) continue;
-                    if (!_grid[r, c]) continue;
                     CheckMatches(new GridPosition(r, c));
-                    int coloredBlockCount = 0;
                     
-                    foreach (GridPosition pos in _connectedBlocks)
-                    {
-                        if (_grid[pos.Row, pos.Column].GetColor() >= 0) coloredBlockCount++;
-                    }
-                    
-                    if (coloredBlockCount >= GameValues.MinimumMatchCount)
+                    if (_coloredBlockCountInGroup >= GameValues.MinimumMatchCount)
                     {
                         _currentGroups.Add(_blockGroupID, new List<GridPosition>(_connectedBlocks));
                         visualController.UpdateAndChangeColoredBlockSprites(_connectedBlocks);
@@ -237,6 +234,5 @@ namespace Runtime.Managers
             if (pos.Column > 0) yield return  new GridPosition(pos.Row, pos.Column - 1);
             if (pos.Column < cols - 1) yield return  new GridPosition(pos.Row, pos.Column + 1);
         }
-
     }
 }
