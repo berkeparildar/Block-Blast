@@ -657,7 +657,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridManager: {fileID: 153811017}
-  blockPrefab: {fileID: 2137881297416816198, guid: 8c7cbd9f77bb84d76b65ca7f65e2f875, type: 3}
+  blockManagerPrefab: {fileID: 2137881297416816198, guid: 8c7cbd9f77bb84d76b65ca7f65e2f875, type: 3}
   blockContainer: {fileID: 638639311}
 --- !u!114 &153811017
 MonoBehaviour:
@@ -689,7 +689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f5b91efdf3648ecbd35870410c86da8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridManager: {fileID: 153811017}
+  gridManager: {fileID: 153811017}
 --- !u!114 &153811019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -715,7 +715,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3002d9f43ce249ab94c486ed4dcbb112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridManager: {fileID: 153811017}
+  gridManager: {fileID: 153811017}
 --- !u!114 &153811021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2663,7 +2663,7 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: 0
+  m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1

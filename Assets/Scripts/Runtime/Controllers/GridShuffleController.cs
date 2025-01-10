@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Runtime.Blocks;
 using Runtime.Data.ValueObjects;
 using Runtime.Extensions;
 using Runtime.Managers;
@@ -13,7 +12,7 @@ namespace Runtime.Controllers
         private GridData _gridData;
         private const int MaxAttempts = 100;
         private readonly Dictionary<int, int> _colorCounts = new();
-        private readonly List<BlastableBlock> _coloredBlocks = new();
+        private readonly List<BlockManager> _coloredBlocks = new();
         [SerializeField] private GridManager gridManager;
 
         public void SetData(GridData data)
@@ -42,20 +41,20 @@ namespace Runtime.Controllers
                 int needed = GameValues.MinimumMatchCount - _colorCounts[groupColorKey];
                 for (int i = 0; i < needed; i++)
                 {
-                    BlastableBlock blockToRecolor = _coloredBlocks
+                    BlockManager blockManagerToRecolor = _coloredBlocks
                         .First(b => b.GetColor() != groupColorKey);
-                    blockToRecolor.SetColor(groupColorKey);
+                    blockManagerToRecolor.SetColor(groupColorKey);
                 }
             }
             _colorCounts.Clear();
 
-            List<BlastableBlock> groupedBlocks = _coloredBlocks
+            List<BlockManager> groupedBlocks = _coloredBlocks
                 .Where(b => b.GetColor() == groupColorKey)
                 .Take(GameValues.MinimumMatchCount)
                 .ToList();
 
             // remove them from 'allColoredBlocks'
-            foreach (BlastableBlock b in groupedBlocks)
+            foreach (BlockManager b in groupedBlocks)
                 _coloredBlocks.Remove(b);
 
             ClearGrid();
@@ -81,7 +80,6 @@ namespace Runtime.Controllers
                 int c = startCol + i;
                 gridManager.SetBlockAtPosition(placementRow, c, groupedBlocks[i]);
                 groupedBlocks[i].SetInitialBlockPosition(c, placementRow);
-                groupedBlocks[i].UpdateSortingOrder();
             }
 
             // 7) Fill remaining grid positions
@@ -94,20 +92,19 @@ namespace Runtime.Controllers
                         continue;
 
                     // Place a leftover block or dequeue a new one
-                    BlastableBlock blockToPlace;
+                    BlockManager blockManagerToPlace;
                     if (_coloredBlocks.Count > 0)
                     {
-                        blockToPlace = _coloredBlocks[0];
+                        blockManagerToPlace = _coloredBlocks[0];
                         _coloredBlocks.RemoveAt(0);
                     }
                     else
                     {
-                        blockToPlace = GridFillController.DequeueBlock();
+                        blockManagerToPlace = GridFillController.DequeueBlock();
                     }
 
-                    gridManager.SetBlockAtPosition(r, c, blockToPlace);
-                    blockToPlace.SetInitialBlockPosition(c, r);
-                    blockToPlace.UpdateSortingOrder();
+                    gridManager.SetBlockAtPosition(r, c, blockManagerToPlace);
+                    blockManagerToPlace.SetInitialBlockPosition(c, r);
                 }
             }
             _coloredBlocks.Clear();
@@ -120,7 +117,7 @@ namespace Runtime.Controllers
             {
                 for (int c = 0; c < _gridData.GridColumnSize; c++)
                 {
-                    BlastableBlock b = gridManager.GetBlockAtPosition(r, c);
+                    BlockManager b = gridManager.GetBlockAtPosition(r, c);
                     if (b.GetColor() >= 0)
                     {
                         _coloredBlocks.Add(b);
@@ -129,9 +126,9 @@ namespace Runtime.Controllers
             }
         }
 
-        private void CountBlockColors(List<BlastableBlock> blocks)
+        private void CountBlockColors(List<BlockManager> blocks)
         {
-            foreach (BlastableBlock block in blocks)
+            foreach (BlockManager block in blocks)
             {
                 int color = block.GetColor();
                 if (color < 0) continue;
@@ -168,7 +165,7 @@ namespace Runtime.Controllers
                 bool canPlace = true;
                 for (int offset = 0; offset < neededCount; offset++)
                 {
-                    BlastableBlock b = gridManager.GetBlockAtPosition(randomRow, randomStartCol + offset);
+                    BlockManager b = gridManager.GetBlockAtPosition(randomRow, randomStartCol + offset);
                     bool isObstacle = b && b.GetColor() < 0;
                     if (isObstacle)
                     {

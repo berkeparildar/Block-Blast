@@ -7,7 +7,7 @@ namespace Runtime.Managers
     public class AdsManager : MonoBehaviour
     {
 #if UNITY_ANDROID
-        private string _adUnitId = "ca-app-pub-3082331033671775~2598942905";
+        private string _adUnitId = "ca-app-pub-3082331033671775/3977567206";
 #elif UNITY_IPHONE
   private string _adUnitId = "ca-app-pub-3940256099942544/4411468910";
 #else
@@ -19,10 +19,9 @@ namespace Runtime.Managers
         {
             MobileAds.Initialize((InitializationStatus initStatus) =>
             {
-                // This callback is called once the MobileAds SDK is initialized.
+                Debug.Log("Initialization status: " + initStatus);
+                LoadInterstitialAd();
             });
-
-            LoadInterstitialAd();
         }
 
         private void LoadInterstitialAd()
@@ -41,7 +40,7 @@ namespace Runtime.Managers
                     {
                         return;
                     }
-
+                    Debug.Log("Ad was loaded");
                     _interstitialAd = ad;
                     RegisterEventHandlers(_interstitialAd);
                 });

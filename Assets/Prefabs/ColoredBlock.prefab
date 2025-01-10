@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 6563502873483199017}
   - component: {fileID: 7589488502014898486}
   - component: {fileID: 2137881297416816198}
+  - component: {fileID: -5140770129679162018}
+  - component: {fileID: -2195009733271215774}
   m_Layer: 0
   m_Name: ColoredBlock
   m_TagString: Untagged
@@ -98,9 +100,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b4139d8bb5146babb4d7e28a3e4cad4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementController: {fileID: -5140770129679162018}
+  visualController: {fileID: -2195009733271215774}
+  blockSO: {fileID: 11400000, guid: ec159ac9160c0c7428784255e34e632e, type: 2}
+--- !u!114 &-5140770129679162018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511725135015857782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f01d8bb4e5e48cea01d83c38b903136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2195009733271215774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511725135015857782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 970fac9139fe42c2afe74fa1f6f8bbd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   backgroundSpriteRenderer: {fileID: 7589488502014898486}
   foregroundSpriteRenderer: {fileID: 8983808001149950802}
-  blockSO: {fileID: 11400000, guid: ec159ac9160c0c7428784255e34e632e, type: 2}
 --- !u!1 &6855222666555510117
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,7 +201,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 20
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

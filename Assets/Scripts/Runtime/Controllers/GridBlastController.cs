@@ -1,59 +1,55 @@
 using System.Collections.Generic;
-using Runtime.Blocks;
 using Runtime.Data.ValueObjects;
 using Runtime.Events;
 using Runtime.Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Runtime.Controllers
 {
     public class GridBlastController : MonoBehaviour
     {
-        [SerializeField] private GridManager _gridManager;
-        private GridData m_GridData;
+        [SerializeField] private GridManager gridManager;
+        private GridData _gridData;
 
-        public (GridPosition min, GridPosition max) Blast(List<GridPosition> matchedBlocks)
+        public (int min, int max) Blast(List<GridPosition> matchedBlocks)
         {
             int minColumn = 10;
             int maxColumn = -1;
-            int minRow = 10;
-            int maxRow = -1;
 
             foreach (GridPosition pos in matchedBlocks)
             {
                 if (pos.Column < minColumn) minColumn = pos.Column;
                 if (pos.Column > maxColumn) maxColumn = pos.Column;
-                if (pos.Row < minRow) minRow = pos.Row;
-                if (pos.Row > maxRow) maxRow = pos.Row;
-                if (_gridManager.GetBlockAtPosition(pos.Row, pos.Column).TakeDamage() > 0) continue;
-                _gridManager.GetBlockAtPosition(pos.Row, pos.Column).Blast();
-                _gridManager.SetBlockAtPosition(pos.Row, pos.Column, null);
+                if (gridManager.GetBlockAtPosition(pos.Row, pos.Column).TakeDamage() > 0) continue;
+                gridManager.GetBlockAtPosition(pos.Row, pos.Column).Blast();
+                gridManager.SetBlockAtPosition(pos.Row, pos.Column, null);
             }
 
-            LevelEvents.Instance.OnBlast.Invoke();
-            return (new GridPosition(minRow, minColumn), new GridPosition(maxRow, maxColumn));
+            GameEvents.Instance.OnBlast.Invoke();
+            return (minColumn, maxColumn);
         }
 
 
-        public void UpdateGridAfterBlast((GridPosition min, GridPosition max) gridBounds)
+        public void UpdateGridAfterBlast((int min, int max) columnRange)
         {
-            int rows = m_GridData.GridRowSize;
+            int rows = _gridData.GridRowSize;
             
-            for (int c = gridBounds.min.Column; c <= gridBounds.max.Column; c++)
+            for (int c = columnRange.min; c <= columnRange.max; c++)
             {
-                for (int r = gridBounds.min.Row; r < rows; r++)
+                for (int r = 0; r < rows; r++)
                 {
-                    if (_gridManager.GetBlockAtPosition(r, c) != null) continue;
+                    if (gridManager.GetBlockAtPosition(r, c) != null) continue;
                     for (int nr = r + 1; nr < rows; nr++)
                     {
-                        BlastableBlock aboveBlock = _gridManager.GetBlockAtPosition(nr, c);
-                        if (aboveBlock == null) continue;
-                        if (aboveBlock.GetColor() < 0) break;
+                        BlockManager aboveBlockManager = gridManager.GetBlockAtPosition(nr, c);
+                        if (aboveBlockManager == null) continue;
+                        if (aboveBlockManager.GetColor() < 0) break;
                         
-                        _gridManager.SetBlockAtPosition(r, c, aboveBlock);
-                        _gridManager.SetBlockAtPosition(nr, c, null);
+                        gridManager.SetBlockAtPosition(r, c, aboveBlockManager);
+                        gridManager.SetBlockAtPosition(nr, c, null);
                         
-                        StartCoroutine(aboveBlock.MoveToTargetGridPosition(new Vector2Int(c, r)));
+                        StartCoroutine(aboveBlockManager.MoveToTargetGridPosition(new Vector2Int(c, r)));
                         
                         break;
                     }
@@ -61,6 +57,6 @@ namespace Runtime.Controllers
             }
         }
 
-        public void SetData(GridData data) => m_GridData = data;
+        public void SetData(GridData data) => _gridData = data;
     }
 }

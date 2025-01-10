@@ -23,7 +23,7 @@ namespace Runtime.Managers
 
         private void SubscribeEvents()
         {
-            LevelEvents.Instance.OnLevelInitialized += HideLoadingScreen;
+            GameEvents.Instance.OnLevelInitialized += HideLoadingScreen;
             UIEvents.Instance.OnTargetsSet += SetData;
             UIEvents.Instance.OnPlayerMove += SetMoveCount;
             UIEvents.Instance.OnBlockBlasted += BlockBlasted;

@@ -29,10 +29,10 @@ namespace Runtime.Managers
         
         private void OnTapPerformed(InputAction.CallbackContext context)
         {
-            if (LevelEvents.Instance.IsLevelFinished.Invoke()) return;
+            if (GameEvents.Instance.IsLevelFinished.Invoke()) return;
             Vector2 screenPos = _inputController.Blast.Position.ReadValue<Vector2>();
             Vector2 worldPos  = _camera.ScreenToWorldPoint(screenPos);
-            InputEvents.Instance.OnTap?.Invoke(worldPos);
+            GameEvents.Instance.OnTap?.Invoke(worldPos);
         }
     }
 }

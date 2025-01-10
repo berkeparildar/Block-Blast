@@ -20,7 +20,7 @@ namespace Runtime.Managers
         
         private void SubscribeEvents()
         {
-            GridEvents.Instance.OnGridSizeSet += CenterCameraOnGrid;
+            GameEvents.Instance.OnGridSizeSet += CenterCameraOnGrid;
         }
 
         private void CenterCameraOnGrid(int columnCount, int rowCount)

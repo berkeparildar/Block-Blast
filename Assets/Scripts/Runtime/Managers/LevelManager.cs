@@ -23,6 +23,8 @@ namespace Runtime.Managers
 
         public void Awake()
         {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = 60;
             _firestoreReader = new FirestoreReader();
             InitializeLevel();
         }
@@ -34,9 +36,9 @@ namespace Runtime.Managers
 
         private void SubscribeEvents()
         {
-            LevelEvents.Instance.OnBlockBlasted += BlockBlasted;
-            LevelEvents.Instance.OnBlast += PlayerBlasted;
-            LevelEvents.Instance.IsLevelFinished += () => _levelFinish;
+            GameEvents.Instance.OnBlockBlasted += BlockBlasted;
+            GameEvents.Instance.OnBlast += PlayerBlasted;
+            GameEvents.Instance.IsLevelFinished += () => _levelFinish;
         }
 
         private void InitializeLevel()
@@ -55,7 +57,7 @@ namespace Runtime.Managers
             _moveCount = _levelData.MoveLimit;
             _targets = _levelData.Targets;
             _targetCounts = _levelData.TargetCounts;
-            LevelEvents.Instance.OnLevelInitialized.Invoke();
+            GameEvents.Instance.OnLevelInitialized.Invoke();
         }
 
         private void GetPlayerLevel()
@@ -131,11 +133,6 @@ namespace Runtime.Managers
             yield return new WaitForSeconds(3);
             gridManager.ResetGrid();
             InterstitialAd ad = adsManager.ShowInterstitialAd();
-            if (ad == null)
-            {
-                Debug.LogWarning("Interstitial ad was not ready, reloading scene...");
-                yield break;
-            }
             ad.OnAdFullScreenContentClosed += InitializeLevel;
             ad.OnAdFullScreenContentFailed += error =>
             {

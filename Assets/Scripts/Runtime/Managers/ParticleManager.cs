@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Runtime.Blocks;
 using Runtime.Events;
 using Runtime.Extensions;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace Runtime.Managers
 
         private void SubscribeEvents()
         {
-            GridEvents.Instance.OnGridSizeSet += Setup;
+            GameEvents.Instance.OnGridSizeSet += Setup;
         }
 
         private void Setup(int row, int column)

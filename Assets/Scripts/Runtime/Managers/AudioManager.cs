@@ -16,7 +16,7 @@ namespace Runtime.Managers
 
         private void SubscribeEvents()
         {
-            LevelEvents.Instance.OnBlast += PlayBlockBlast;
+            GameEvents.Instance.OnBlast += PlayBlockBlast;
         }
         
         private void PlayBlockBlast()
