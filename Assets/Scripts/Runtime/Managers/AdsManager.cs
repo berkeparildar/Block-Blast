@@ -17,11 +17,8 @@ namespace Runtime.Managers
 
         public void Start()
         {
-            MobileAds.Initialize((InitializationStatus initStatus) =>
-            {
-                Debug.Log("Initialization status: " + initStatus);
-                LoadInterstitialAd();
-            });
+            MobileAds.Initialize(_ => { });
+            LoadInterstitialAd();
         }
 
         private void LoadInterstitialAd()

@@ -11,5 +11,6 @@ namespace Runtime.Events
         public UnityAction<int> OnBlockBlasted = delegate { };
         public UnityAction OnLevelWin  = delegate { };
         public UnityAction OnLevelLose = delegate { };
+        public UnityAction ResetLevel = delegate { };
     }
 }

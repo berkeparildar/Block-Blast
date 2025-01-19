@@ -46,12 +46,11 @@ namespace Runtime.Managers
                 {
                     if (_grid[i, j] is null) continue;
                     GridFillController.EnqueueBlock(_grid[i, j]);
-                    _visited[i, j] = 0;
-                    _blockGroupID = 0;
-                    _lastVisitedID = 0;
-                    _currentGroups.Clear();
                 }
             }
+            _blockGroupID = 0;
+            _lastVisitedID = 0;
+            _currentGroups.Clear();
             _grid = null;
         }
 

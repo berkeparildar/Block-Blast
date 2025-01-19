@@ -46,6 +46,7 @@ namespace Runtime.Managers
                     tc.gameObject.SetActive(false);
                 }
                 winScreen.SetActive(false);
+                UIEvents.Instance.ResetLevel.Invoke();
             }
         }
         
@@ -64,6 +65,7 @@ namespace Runtime.Managers
                     tc.gameObject.SetActive(false);
                 }
                 loseScreen.SetActive(false);
+                UIEvents.Instance.ResetLevel.Invoke();
             }
         }
 

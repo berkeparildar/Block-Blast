@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GoogleMobileAds.Api;
@@ -14,7 +15,7 @@ namespace Runtime.Managers
         [SerializeField] private GridManager gridManager;
         [SerializeField] private AdsManager adsManager;
         private FirestoreReader _firestoreReader;
-        private int _playerLevel;
+        private static int _playerLevel;
         private LevelData _levelData;
         private int _moveCount;
         private int[] _targets;
@@ -25,6 +26,8 @@ namespace Runtime.Managers
         {
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 60;
+            MobileAds.RaiseAdEventsOnUnityMainThread = true;
+            _playerLevel = PlayerPrefs.GetInt("level", 1);
             _firestoreReader = new FirestoreReader();
             InitializeLevel();
         }
@@ -44,14 +47,12 @@ namespace Runtime.Managers
         private void InitializeLevel()
         {
             _levelFinish = false;
-            GetPlayerLevel();
             GetLevelData();
         }
 
         private async void GetLevelData()
         {
             _levelData = await _firestoreReader.GetLevelData(_playerLevel);
-            _playerLevel = _levelData.Level;
             gridManager.SetGridData(_levelData.GridData);
             UIEvents.Instance.OnTargetsSet.Invoke(_levelData.Targets, _levelData.TargetCounts, _levelData.MoveLimit);
             _moveCount = _levelData.MoveLimit;
@@ -59,12 +60,7 @@ namespace Runtime.Managers
             _targetCounts = _levelData.TargetCounts;
             GameEvents.Instance.OnLevelInitialized.Invoke();
         }
-
-        private void GetPlayerLevel()
-        {
-            _playerLevel = PlayerPrefs.GetInt("level", 1);
-        }
-
+        
         private void BlockBlasted(int colorIndex)
         {
             List<int> targetList = _targets.ToList();
@@ -127,17 +123,46 @@ namespace Runtime.Managers
             UIEvents.Instance.OnLevelLose.Invoke();
             StartCoroutine(ReloadScene());
         }
+        
+        private void RunOnMainThread(Action action)
+        {
+            StartCoroutine(InvokeOnMainThread(action));
+        }
+
+        private IEnumerator InvokeOnMainThread(Action action)
+        {
+            yield return null; // Wait for the next frame on the main thread
+            action?.Invoke();
+        }
 
         private IEnumerator ReloadScene()
         {
             yield return new WaitForSeconds(3);
             gridManager.ResetGrid();
-            InterstitialAd ad = adsManager.ShowInterstitialAd();
-            ad.OnAdFullScreenContentClosed += InitializeLevel;
-            ad.OnAdFullScreenContentFailed += error =>
+            if (_playerLevel % 2 == 0)
+            {
+                InterstitialAd ad = adsManager.ShowInterstitialAd();
+                if (ad is not null && _playerLevel % 2 == 0)
+                {
+                    ad.OnAdFullScreenContentClosed += () =>
+                    {
+                        RunOnMainThread(InitializeLevel);
+                    };
+                    ad.OnAdFullScreenContentFailed += error =>
+                    {
+                        RunOnMainThread(InitializeLevel);
+                    };
+                }
+                else
+                {
+                    InitializeLevel();
+                }
+            }
+            else
             {
                 InitializeLevel();
-            };
+
+            }
         }
     }
 }

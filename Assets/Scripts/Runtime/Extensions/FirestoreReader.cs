@@ -41,7 +41,6 @@ namespace Runtime.Extensions
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error reading level data: {ex}");
                 return default;
             }
         }
