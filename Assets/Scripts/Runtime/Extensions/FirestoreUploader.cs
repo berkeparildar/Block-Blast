@@ -22,104 +22,46 @@ namespace Runtime.Extensions
                         new()
                         {
                             { "rowIndex", 0 },
-                            { "cells", new List<int> { 0, 1, 1, 0 } }
+                            { "cells", new List<int> { 0, 1, 2, 0, 1 } }
                         },
                         new()
                         {
                             { "rowIndex", 1 },
-                            { "cells", new List<int> { 1, 0, 0, 1 } }
+                            { "cells", new List<int> { 2, 2, 0, 1, 1 } }
                         },
                         new()
                         {
                             { "rowIndex", 2 },
-                            { "cells", new List<int> { 2, 2, 2, 3} }
+                            { "cells", new List<int> { 0, 0, 1, 2, 2 } }
                         },
                         new()
                         {
                             { "rowIndex", 3 },
-                            { "cells", new List<int> { 5, 5, 5, 5} }
+                            { "cells", new List<int> { 1, 1, 0, 2, 0 } }
+                        },
+                        new()
+                        {
+                            { "rowIndex", 4 },
+                            { "cells", new List<int> { 2, 0, 0, 1, 1 } }
                         },
                     };
                     
                     Dictionary<string, object> gridData = new()
                     {
-                        { "GridRowSize", 4},
-                        { "GridColumnSize", 4 },
-                        { "ColorCount", 6 },
+                        { "GridRowSize", 5},
+                        { "GridColumnSize", 5 },
+                        { "ColorCount", 3 },
                         { "Grid", gridRows } 
                     };
                     Dictionary<string, object> levelData = new Dictionary<string, object>
                     {
                         { "GridData", gridData },
-                        { "Level", 7 },
-                        { "Targets", new List<int> { 5} },
-                        { "TargetCounts", new List<int> { 12 } },
+                        { "Level", 15 },
+                        { "Targets", new List<int> { 0, 1, 2 } },
+                        { "TargetCounts", new List<int> { 64, 64, 64 } },
                         { "MoveLimit", 32 }
                     };
-                    /*
-                    var gridRows = new List<Dictionary<string, object>>
-                    {
-                        new()
-                        {
-                            { "rowIndex", 0 },
-                            { "cells", new List<int> { -1, -1, -1, -1, -1, -1 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 1 },
-                            { "cells", new List<int> { -1, -1, -1, -1, -1, -1 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 2 },
-                            { "cells", new List<int> {  0,  1,  1,  1,  2,  1 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 3 },
-                            { "cells", new List<int> {  2,  2,  3,  2,  1,  0 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 4 },
-                            { "cells", new List<int> {  0,  1,  1,  0,  1,  0 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 5 },
-                            { "cells", new List<int> {  2,  2,  1,  2,  1,  0 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 6 },
-                            { "cells", new List<int> {  3,  2,  3,  3,  0,  1 } }
-                        },
-                        new()
-                        {
-                            { "rowIndex", 7 },
-                            { "cells", new List<int> {  2,  3,  0,  3,  0,  1 } }
-                        }
-                    };
-
-                    Dictionary<string, object> gridData = new()
-                    {
-                        { "GridRowSize", 8 },
-                        { "GridColumnSize", 6 },
-                        { "ColorCount", 4 },
-                        { "Grid", gridRows } 
-                    };
-
-                    Dictionary<string, object> levelData = new Dictionary<string, object>
-                    {
-                        { "GridData", gridData },
-                        { "Level", 1 },
-                        { "Targets", new List<int> {  0,  1} },
-                        { "TargetCounts", new List<int> {8, 12} },
-                        { "MoveLimit", 40 }
-                    };
-                    */
-
-                    UploadLevelData("levels", "7", levelData);
+                    UploadLevelData("levels", "15", levelData);
                 }
                 else
                 {

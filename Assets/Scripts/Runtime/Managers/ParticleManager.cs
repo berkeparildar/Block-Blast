@@ -24,7 +24,7 @@ namespace Runtime.Managers
 
         private void Setup(int row, int column)
         {
-            _poolAmount = row * column;
+            _poolAmount = 10 * 10;
             _poolableObjectList = new Queue<ParticleSystem>();
 
             for (int i = 0; i < _poolAmount; i++)

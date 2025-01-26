@@ -27,15 +27,13 @@ namespace Runtime.Extensions
             {
                 DocumentSnapshot snapshot = await _db.Collection(CollectionName).Document(level.ToString())
                     .GetSnapshotAsync();
-                if (!snapshot.Exists)
-                {
-                    int lastLevel = level - 1;
-                    PlayerPrefs.SetInt("level", lastLevel);
-                    DocumentSnapshot oldSnapshot = await _db.Collection(CollectionName)
-                        .Document(lastLevel.ToString()).GetSnapshotAsync();
-                    LevelData oldLevelData = ParseLevelData(oldSnapshot.ToDictionary());
-                    return oldLevelData;
+                while (!snapshot.Exists)
+                { 
+                    level--;
+                    snapshot = await _db.Collection(CollectionName)
+                        .Document(level.ToString()).GetSnapshotAsync();
                 }
+                PlayerPrefs.SetInt("level", level);
                 LevelData levelData = ParseLevelData(snapshot.ToDictionary());
                 return levelData;
             }

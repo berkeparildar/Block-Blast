@@ -32,6 +32,7 @@ namespace Runtime.Managers
         public void SetGridData(GridData gridData)
         {
             _gridData = gridData;
+            Debug.Log($"Set grid data: {gridData.GridColumnSize}x{gridData.GridRowSize}");
             _visited = new int[_gridData.GridRowSize, _gridData.GridColumnSize];
             SendDataToControllers();
             InitializeGrid();

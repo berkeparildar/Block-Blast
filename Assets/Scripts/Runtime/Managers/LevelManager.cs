@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GoogleMobileAds.Api;
 using Runtime.Data.ValueObjects;
 using Runtime.Events;
@@ -15,6 +16,7 @@ namespace Runtime.Managers
         [SerializeField] private GridManager gridManager;
         [SerializeField] private AdsManager adsManager;
         private FirestoreReader _firestoreReader;
+        private FirestoreWriter _firestoreWriter;
         private static int _playerLevel;
         private LevelData _levelData;
         private int _moveCount;
@@ -27,8 +29,9 @@ namespace Runtime.Managers
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 60;
             MobileAds.RaiseAdEventsOnUnityMainThread = true;
-            _playerLevel = PlayerPrefs.GetInt("level", 1);
             _firestoreReader = new FirestoreReader();
+            _firestoreWriter = new FirestoreWriter();
+            _playerLevel = PlayerPrefs.GetInt("level", 1);
             InitializeLevel();
         }
 
@@ -44,15 +47,29 @@ namespace Runtime.Managers
             GameEvents.Instance.IsLevelFinished += () => _levelFinish;
         }
 
-        private void InitializeLevel()
+        private async void InitializeLevel()
         {
             _levelFinish = false;
-            GetLevelData();
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+            {
+                var randomLevel = _firestoreWriter.GetRandomLevelData();
+                if (randomLevel.Level == 0)
+                {
+                    return;
+                }
+                await Task.Delay(1000);
+                _levelData = randomLevel;
+            }
+            else
+            { 
+                _levelData = await _firestoreReader.GetLevelData(_playerLevel);
+                _firestoreWriter.SaveLevelData(_levelData);
+            }
+            SetLevelData();
         }
-
-        private async void GetLevelData()
+        
+        private void SetLevelData()
         {
-            _levelData = await _firestoreReader.GetLevelData(_playerLevel);
             gridManager.SetGridData(_levelData.GridData);
             UIEvents.Instance.OnTargetsSet.Invoke(_levelData.Targets, _levelData.TargetCounts, _levelData.MoveLimit);
             _moveCount = _levelData.MoveLimit;
@@ -112,8 +129,11 @@ namespace Runtime.Managers
 
         private void LevelWon()
         {
-            _playerLevel++;
-            PlayerPrefs.SetInt("level", _playerLevel);
+            if (Application.internetReachability != NetworkReachability.NotReachable)
+            {
+                _playerLevel++;
+                PlayerPrefs.SetInt("level", _playerLevel);
+            }
             UIEvents.Instance.OnLevelWin.Invoke();
             StartCoroutine(ReloadScene());
         }
@@ -131,7 +151,7 @@ namespace Runtime.Managers
 
         private IEnumerator InvokeOnMainThread(Action action)
         {
-            yield return null; // Wait for the next frame on the main thread
+            yield return null;
             action?.Invoke();
         }
 
@@ -161,7 +181,6 @@ namespace Runtime.Managers
             else
             {
                 InitializeLevel();
-
             }
         }
     }

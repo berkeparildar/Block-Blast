@@ -11,20 +11,12 @@ namespace Runtime.Managers
         private void Awake()
         {
             _mCamera = Camera.main;
-        }
-        
-        private void OnEnable()
-        {
-            SubscribeEvents();
-        }
-        
-        private void SubscribeEvents()
-        {
             GameEvents.Instance.OnGridSizeSet += CenterCameraOnGrid;
         }
 
         private void CenterCameraOnGrid(int columnCount, int rowCount)
         {
+            Debug.Log("Camera Center");
             float centerX = (columnCount - 1)  * 0.5f;
             float centerY = (rowCount) * 0.5f; 
             
